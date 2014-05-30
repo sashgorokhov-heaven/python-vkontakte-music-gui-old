@@ -1,0 +1,1 @@
+c:\Python33\Lib\site-packages\PyQt4\pyrcc4.exe -py3 resourses.qrc > resourses.py
