@@ -12,8 +12,6 @@ if not os.path.exists(CACHEFILE):
 __cache = pickle.load(open(CACHEFILE, 'rb'))
 __temp_session = dict()
 
-#log
-
 #Держит кэшированные файлы в запикленном словаре "имя файла":bytes файла.
 #get возвращает имя временного файла
 

@@ -1,10 +1,12 @@
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
+from modules import logger
+
 try:
     import modules.testimports
-except ImportError:
-    #logerror
+except ImportError as e:
+    logger.write('Import error: {}'.format(str(e)))
     exit(-1)
 
 from modules import constants, util
@@ -22,7 +24,8 @@ else:
     access_token, user_id, expires = accesstokener.get()
 
 if not access_token or (access_token and not api.test_connection(access_token)):
-    #logerror
+    logger.write('Empty token or invalid token')
+    accesstokener.clear()
     exit(-1)
 
 from modules.forms import mainform

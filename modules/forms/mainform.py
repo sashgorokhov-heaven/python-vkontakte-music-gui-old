@@ -3,7 +3,7 @@ __email__ = 'sashgorokhov@gmail.com'
 
 from modules.gorokhovlibs.qt.qtwindow import BaseQtWindow
 import os
-from modules import constants
+from modules import constants, logger
 from resourses import resourses
 
 
