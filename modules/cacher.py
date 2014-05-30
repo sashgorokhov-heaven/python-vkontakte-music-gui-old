@@ -17,6 +17,9 @@ __temp_session = dict()
 
 def clear():
     pickle.dump(dict(), open(CACHEFILE, 'wb'))
+    global __cache
+    del __cache
+    __cache = dict()
 
 def exists(file):
     return file in __cache
@@ -35,7 +38,11 @@ def get_bytes(file):
 
 def put_bytes(b, file):
     __cache[file] = b
+    pickle.dump(__cache, open(CACHEFILE, 'wb'))
 
-def put_file(file):
+def put_file(file, name=None):
     with open(file, 'rb') as f:
-        put_bytes(f.read(), file)
+        if name:
+            put_bytes(f.read(), name)
+        else:
+            put_bytes(f.read(), file)

@@ -15,11 +15,13 @@ from modules.gorokhovlibs.vk import accesstokener, api
 access_token = user_id = expires = None
 if not accesstokener.good():
     from modules.gorokhovlibs.vk.qt import auth
+    from modules import cacher
     auth.DESCTIPTION = constants.application_title
     access_token, user_id, expires = auth.show_browser(constants.application_id, constants.permissions_scope)
     if not access_token:
         exit(-1)
     accesstokener.new(access_token, user_id, expires)
+    cacher.clear()
 else:
     access_token, user_id, expires = accesstokener.get()
 
@@ -31,8 +33,7 @@ if not access_token or (access_token and not api.test_connection(access_token)):
 from modules.forms import mainform
 from PyQt4 import QtGui
 
-vkapi = api.VKApi(access_token)
 app = QtGui.QApplication([])
-mform = mainform.MainForm(access_token)
+mform = mainform.MainForm(api.VKApi(access_token))
 mform.show()
 app.exec_()
