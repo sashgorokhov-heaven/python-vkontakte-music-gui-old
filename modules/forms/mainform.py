@@ -4,7 +4,7 @@ __email__ = 'sashgorokhov@gmail.com'
 from PyQt4 import QtCore
 from modules.gorokhovlibs.qt.qtwindow import BaseQtWindow
 import os
-from modules import constants, logger, navigation_lists, audio_list
+from modules import constants, navigation_lists, audio_list, download_manager
 from resourses import resourses
 
 
@@ -16,12 +16,14 @@ class MainForm(BaseQtWindow):
         self.navigation_lists = navigation_lists.NavigationLists(self)
         self.audio_list = audio_list.AudioListWidget(self)
         self.audio_list.connect(self.navigation_lists, QtCore.SIGNAL('listsItemClicked(int)'), self.audio_list.load_audio)
-        self.elements.checkAllButton.clicked.connect(self.audio_list.checkAll)
-        self.elements.uncheckAllButton.clicked.connect(self.audio_list.uncheckAll)
-
+        self.download_manager = download_manager.AudioDownloadWidget(self)
+        self.elements.downloadButton.clicked.connect(self.download_manager.show)
 
     def _set_connections(self):
         pass
+
+    def downloadAudio(self, oobject):
+        self.download_manager.addAudio(oobject)
 
     def closeEvent(self, event):
         self.navigation_lists.close()

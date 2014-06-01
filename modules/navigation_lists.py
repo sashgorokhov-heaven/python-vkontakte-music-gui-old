@@ -2,9 +2,35 @@ __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
 from modules.gorokhovlibs.threadeddecor import threaded
-from modules import navigation_lists_items
+from modules import cacher
 from PyQt4 import QtCore, QtGui
-import re
+import re, os.path
+
+class UserListItem(QtGui.QListWidgetItem):
+    def __init__(self, userobject, api):
+        self.object = userobject
+        self.filename = str(self.object['id'])+os.path.splitext(self.object['photo_100'])[1]
+        if not cacher.exists(self.filename):
+            cacher.put_file(api.download(self.object['photo_100']), self.filename)
+        self.filename = cacher.get_file(self.filename)
+        text = self.object['first_name']+' '+self.object['last_name']
+        super().__init__(text)
+
+    def _setIcon(self):
+        self.setIcon(QtGui.QIcon(self.filename))
+
+class GroupsListItem(QtGui.QListWidgetItem):
+    def __init__(self, groupobject, api):
+        self.object = groupobject
+        self.filename = str(self.object['id'])+os.path.splitext(self.object['photo_100'])[1]
+        if not cacher.exists(self.filename):
+            cacher.put_file(api.download(self.object['photo_100']), self.filename)
+        self.filename = cacher.get_file(self.filename)
+        text = self.object['name']
+        super().__init__(text)
+
+    def _setIcon(self):
+        self.setIcon(QtGui.QIcon(self.filename))
 
 class NavigationLists(QtCore.QObject):
     def __init__(self, parent):
@@ -23,7 +49,7 @@ class NavigationLists(QtCore.QObject):
         self.stop = True
 
     def set_connections(self):
-        self.connect(self, QtCore.SIGNAL('setIcons(int, QString)'), self.__setIcons)
+        self.connect(self, QtCore.SIGNAL('setIcons(int, QString)'), self.__setIcon)
         self.connect(self, QtCore.SIGNAL('loadUserComplete()'), self.loadUserComplete)
         self.parent.elements.userList.itemClicked.connect(self.listsItemClicked)
         self.parent.elements.groupsList.itemClicked.connect(self.listsItemClicked)
@@ -55,10 +81,10 @@ class NavigationLists(QtCore.QObject):
         else:
             self.parent.elements.groupsList.scrollToItem(self.parent.elements.groupsList.item(0))
 
-    def setIcons(self, id, listname):
+    def setIcon(self, id, listname):
         self.emit(QtCore.SIGNAL('setIcons(int, QString)'), id, listname)
 
-    def __setIcons(self, id, listname):
+    def __setIcon(self, id, listname):
         list_ = getattr(self, listname)
         for itemobject, item in list_:
             if self.stop:
@@ -70,10 +96,10 @@ class NavigationLists(QtCore.QObject):
     @threaded
     def loadUser(self):
         userobject = self.parent.api.call('users.get', fields='photo_100')[0]
-        item = navigation_lists_items.UserListItem(userobject, self.parent.api)
+        item = UserListItem(userobject, self.parent.api)
         self.parent.elements.userList.addItem(item)
         self.userlist.append((userobject, item))
-        self.setIcons(userobject['id'], 'userlist')
+        self.setIcon(userobject['id'], 'userlist')
         self.emit(QtCore.SIGNAL('loadUserComplete()'))
 
     def loadUserComplete(self):
@@ -90,10 +116,10 @@ class NavigationLists(QtCore.QObject):
         for n, friendobject in enumerate(friends, 1):
             if self.stop:
                 return
-            item = navigation_lists_items.UserListItem(friendobject, self.parent.api)
+            item = UserListItem(friendobject, self.parent.api)
             self.parent.elements.friendsList.addItem(item)
             self.friendslist.append((friendobject, item))
-            self.setIcons(friendobject['id'], 'friendslist')
+            self.setIcon(friendobject['id'], 'friendslist')
             self.emit(QtCore.SIGNAL('setFriendsLoadPbar(int)'), n/len(friends)*100)
 
     @threaded
@@ -102,8 +128,8 @@ class NavigationLists(QtCore.QObject):
         for n, groupobject in enumerate(groups, 1):
             if self.stop:
                 return
-            item = navigation_lists_items.GroupsListItem(groupobject, self.parent.api)
+            item = GroupsListItem(groupobject, self.parent.api)
             self.parent.elements.groupsList.addItem(item)
             self.groupslist.append((groupobject, item))
-            self.setIcons(groupobject['id'], 'groupslist')
+            self.setIcon(groupobject['id'], 'groupslist')
             self.emit(QtCore.SIGNAL('setGroupsLoadPbar(int)'), n/len(groups)*100)

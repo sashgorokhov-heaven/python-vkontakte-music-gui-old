@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>850</width>
-    <height>598</height>
+    <height>543</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -656,6 +656,16 @@ border-bottom-left-radius: 7px;
        <property name="topMargin">
         <number>0</number>
        </property>
+       <item>
+        <widget class="QPushButton" name="downloadButton">
+         <property name="text">
+          <string>К загрузке:</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
        <item>
         <spacer name="horizontalSpacer_2">
          <property name="orientation">

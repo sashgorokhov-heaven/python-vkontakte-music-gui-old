@@ -27,6 +27,7 @@ class AudioListWidgetItem(QtGui.QWidget):
         self.elements.durationLabel.setText(str(mins)+':'+'0'*(2-len(str(secs)))+str(secs))
         self.elements.playLabel.setText('0:00')
 
+        self.elements.checkBox.setVisible(False)
 
     def check(self):
         self.elements.checkBox.setCheckState(2)
@@ -37,10 +38,8 @@ class AudioListWidgetItem(QtGui.QWidget):
         self.checked = False
 
     def doubleClicked(self):
-        if self.checked:
-            self.uncheck()
-        else:
-            self.check()
+        self.setEnabled(False)
+        self.parent.parent.downloadAudio(self.object)
 
     def mouseDoubleClickEvent(self, event):
         self.doubleClicked()
