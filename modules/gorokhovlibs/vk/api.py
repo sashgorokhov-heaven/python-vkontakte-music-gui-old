@@ -4,7 +4,10 @@ __email__ = "sashgorokhov@gmail.com"
 import urllib.request, urllib.parse, requests, json
 
 
-class VKError(Exception): pass
+class VKError(Exception):
+    def __init__(self, error):
+        super().__init__(error)
+        self.error = error
 
 
 class VKApi:

@@ -50,4 +50,4 @@ if __name__ == '__main__':
             super().__init__(self, 'YourWindow.ui')
 
         def _set_connections(self):
-            self.elements.Button1.clicked.connect(lambda: print(self.elements.Label1.text()))
+            self.elements.Button1.load_audio.connect(lambda: print(self.elements.Label1.text()))

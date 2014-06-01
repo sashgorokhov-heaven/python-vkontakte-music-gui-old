@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>Icons/helpicon.ico</file>
     <file>Icons/music.ico</file>
     <file>Icons/aborticon.ico</file>
     <file>Icons/albumicon.ico</file>
@@ -15,5 +16,11 @@
     <file>Icons/photoicon.ico</file>
     <file>Icons/upicon.ico</file>
     <file>Icons/windowicon.ico</file>
+  </qresource>
+  <qresource prefix="newicons">
+    <file>Icons/Sekkyumu-Developpers-Help-Blue-Button.ico</file>
+    <file>Icons/Sekkyumu-Developpers-Pause-Blue-Button.ico</file>
+    <file>Icons/Sekkyumu-Developpers-Play-Blue-Button.ico</file>
+    <file>Icons/Sekkyumu-Developpers-Spotlight-Blue-Button.ico</file>
   </qresource>
 </RCC>

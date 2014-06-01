@@ -7,12 +7,25 @@ import os.path
 
 class UserListItem(QtGui.QListWidgetItem):
     def __init__(self, userobject, api):
-        self.userobject = userobject
-        self.filename = str(self.userobject['id'])+os.path.splitext(self.userobject['photo_100'])[1]
+        self.object = userobject
+        self.filename = str(self.object['id'])+os.path.splitext(self.object['photo_100'])[1]
         if not cacher.exists(self.filename):
-            cacher.put_file(api.download(self.userobject['photo_100']), self.filename)
+            cacher.put_file(api.download(self.object['photo_100']), self.filename)
         self.filename = cacher.get_file(self.filename)
-        text = self.userobject['first_name']+' '+self.userobject['last_name']
+        text = self.object['first_name']+' '+self.object['last_name']
+        super().__init__(text)
+
+    def _setIcon(self):
+        self.setIcon(QtGui.QIcon(self.filename))
+
+class GroupsListItem(QtGui.QListWidgetItem):
+    def __init__(self, groupobject, api):
+        self.object = groupobject
+        self.filename = str(self.object['id'])+os.path.splitext(self.object['photo_100'])[1]
+        if not cacher.exists(self.filename):
+            cacher.put_file(api.download(self.object['photo_100']), self.filename)
+        self.filename = cacher.get_file(self.filename)
+        text = self.object['name']
         super().__init__(text)
 
     def _setIcon(self):

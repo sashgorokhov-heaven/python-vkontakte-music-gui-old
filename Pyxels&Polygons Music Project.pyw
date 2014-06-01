@@ -25,9 +25,13 @@ if not accesstokener.good():
 else:
     access_token, user_id, expires = accesstokener.get()
 
-if not access_token or (access_token and not api.test_connection(access_token)):
-    logger.write('Empty token or invalid token')
-    accesstokener.clear()
+try:
+    if not access_token or (access_token and not api.test_connection(access_token)):
+        logger.write('Empty token or invalid token')
+        accesstokener.clear()
+        exit(-1)
+except Exception as e:
+    logger.write('Seems like internet connection error')
     exit(-1)
 
 from modules.forms import mainform
