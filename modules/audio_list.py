@@ -5,68 +5,92 @@ from PyQt4 import QtCore, QtGui, uic
 import threading, os.path, time
 from modules.gorokhovlibs.qt import qtwindow
 from modules.gorokhovlibs.threadeddecor import threaded
+from modules import util
+
+STATES = {0:'Ожидает загрузки', 1:'Загружается', 2:'Загружено', 3:'Ошибка', 4:'Отмена'}
+
 
 class AudioListWidgetItem(QtGui.QWidget):
-    def __init__(self, oobject, parent, parentitem):
-        self.object = oobject
-        self.parent = parent
-        self.item = parentitem
-        self.checked = False
+    def __init__(self, vkobject, parent, parentitem):
         super().__init__()
         uic.loadUi(os.path.join('resourses', 'audiowidget.ui'), self)
-
-        self.item.setSizeHint(self.sizeHint())
-
         setattr(self, 'elements', qtwindow._Elements(qtwindow.BaseQtWindow._set_childs(None, self)))
 
-        self.elements.titleLabel.setText(str(oobject['title']))
-        self.elements.artistLabel.setText(str(oobject['artist']))
+        self.vkaudio = util.VkAudio(vkobject)
+        self.parent = parent
+        self.item = parentitem
+        self.choosed = False
 
-        mins = (oobject['duration'] // 60)
-        secs = oobject['duration']-60*(oobject['duration'] // 60)
-        self.elements.durationLabel.setText(str(mins)+':'+'0'*(2-len(str(secs)))+str(secs))
+        self.item.setSizeHint(self.sizeHint())
+        self.elements.titleLabel.setText(str(self.vkaudio.title()))
+        self.elements.artistLabel.setText(str(self.vkaudio.artist()))
+        self.elements.durationLabel.setText('{}:{}'.format(*self.vkaudio.duration(True)))
         self.elements.playLabel.setText('0:00')
 
-        self.elements.checkBox.setVisible(False)
+        if self.vkaudio.id() in self.parent.choosed[self.parent.current_id]:
+            self.parent.choosed[self.parent.current_id][self.vkaudio.id()] = \
+                (self.parent.choosed[self.parent.current_id][self.vkaudio.id()][0], self)
+            self.updateState(self.parent.choosed[self.parent.current_id][self.vkaudio.id()][0])
 
-    def check(self):
-        self.elements.checkBox.setCheckState(2)
-        self.checked = True
+    def __setChoose(self, state):
+        self.choosed = state
+        self.setEnabled(not state)
 
-    def uncheck(self):
-        self.elements.checkBox.setCheckState(0)
-        self.checked = False
+    def choose(self):
+        self.__setChoose(True)
+
+    def unchoose(self):
+        self.__setChoose(False)
 
     def doubleClicked(self):
-        self.setEnabled(False)
-        self.parent.parent.downloadAudio(self.object)
+        self.choose()
+        self.parent.parent.buffer.put(self.vkaudio.id(), self.vkaudio)
+        self.parent.choosed[self.parent.current_id][self.vkaudio.id()] = (0, self)
+        self.parent.emit(QtCore.SIGNAL('itemChoosed(int)'), self.vkaudio.id())
 
     def mouseDoubleClickEvent(self, event):
         self.doubleClicked()
 
+    def updateState(self, state_n):
+        if state_n>=2:
+            self.unchoose()
+        self.elements.stateLabel.setText(STATES[state_n])
+
+
+#emits | itemChoosed(int)
+#listents | menuItemClicked(int) | from NavigationMenu
+#listens | updateState(int, int) | from DownloadManager
 class AudioListWidget(QtCore.QObject):
     def __init__(self, parent):
         self.parent = parent
         super().__init__(parent)
         self.stop = False
         self.worklock = threading.Lock()
-        self.current_id = None
-        self.current_audiolist = list()
+        self.choosed = dict() # user_id -> audio_id -> (state, widget)
         self.connect(self, QtCore.SIGNAL('addAudioItem(int)'), self.__addAudioItem)
+        self.current_id = None
 
     def close(self):
         self.stop = True
 
-    def load_audio(self, id):
+    def updateState(self, aid, state_n):
+        pass
+
+    def load_audio(self, owner_id):
         self.stop = True
         with self.worklock:
             self.stop = False
+            if owner_id not in self.choosed:
+                self.choosed[owner_id] = dict()
+            if self.current_id:
+                for key in self.choosed[self.current_id]:
+                    self.choosed[self.current_id][key] = \
+                        (self.choosed[self.current_id][key][0], None)
+            self.current_id = owner_id
             self.parent.elements.audioList.clear()
-            self.current_audiolist = list()
-            self.current_id = id
             self.parent.elements.countLabel.setText('0')
             try:
-                audios = self.parent.api.call('audio.get', owner_id=id)['items']
+                audios = self.parent.api.call('audio.get', owner_id=owner_id)['items']
             except Exception as e:
                 if e.error['error_code']==15:
                     self.parent.elements.audioList.addItem(
@@ -79,44 +103,30 @@ class AudioListWidget(QtCore.QObject):
                     self.parent.elements.audioList.addItem(
                         QtGui.QListWidgetItem('Аудиозаписей нет.'))
                     return
-                self.fill_list(audios)
+                self.parent.elements.countLabel.setText(str(len(audios)))
+                self.__fill_list(audios)
 
     @threaded
-    def fill_list(self, audios):
+    def __fill_list(self, audios):
         with self.worklock:
-            self.parent.elements.countLabel.setText(str(len(audios)))
-            self.current_audiolist = audios
-            for n, audio in enumerate(audios):
+            for vkobject in audios:
                 if self.stop:
                     return
-                self.addAudioItem(n)
-                time.sleep(0.05)
+                self.parent.buffer.put(vkobject['id'], vkobject)
+                self.addAudioItem(vkobject['id'])
+                time.sleep(0.06)
 
-    def __addAudioItem(self, n):
+    def __addAudioItem(self, aid):
         if self.stop:
             return
         try:
-            audio = self.current_audiolist[n]
+            vkaudio = self.parent.buffer.remove(aid)
             item = QtGui.QListWidgetItem()
-            widget = AudioListWidgetItem(audio, self, item)
+            widget = AudioListWidgetItem(vkaudio, self, item)
             self.parent.elements.audioList.addItem(item)
             self.parent.elements.audioList.setItemWidget(item, widget)
-        except:
-            return
+        except Exception as e:
+            self.parent.elements.audioList.addItem(QtGui.QListWidgetItem('Ошибка создания объекта аудиозаписи: {}'.format(e)))
 
     def addAudioItem(self, n):
         self.emit(QtCore.SIGNAL('addAudioItem(int)'), int(n))
-
-    def checkAll(self):
-        n = self.parent.elements.audioList.count()
-        for i in range(n):
-            item = self.parent.elements.audioList.item(i)
-            widget = self.parent.elements.audioList.itemWidget(item)
-            widget.check()
-
-    def uncheckAll(self):
-        n = self.parent.elements.audioList.count()
-        for i in range(n):
-            item = self.parent.elements.audioList.item(i)
-            widget = self.parent.elements.audioList.itemWidget(item)
-            widget.uncheck()

@@ -11,7 +11,7 @@ class UserListItem(QtGui.QListWidgetItem):
         self.object = userobject
         self.filename = str(self.object['id'])+os.path.splitext(self.object['photo_100'])[1]
         if not cacher.exists(self.filename):
-            cacher.put_file(api.download(self.object['photo_100']), self.filename)
+            cacher.put_file(api.download_loop(self.object['photo_100']), self.filename)
         self.filename = cacher.get_file(self.filename)
         text = self.object['first_name']+' '+self.object['last_name']
         super().__init__(text)
@@ -24,7 +24,7 @@ class GroupsListItem(QtGui.QListWidgetItem):
         self.object = groupobject
         self.filename = str(self.object['id'])+os.path.splitext(self.object['photo_100'])[1]
         if not cacher.exists(self.filename):
-            cacher.put_file(api.download(self.object['photo_100']), self.filename)
+            cacher.put_file(api.download_loop(self.object['photo_100']), self.filename)
         self.filename = cacher.get_file(self.filename)
         text = self.object['name']
         super().__init__(text)
@@ -32,7 +32,9 @@ class GroupsListItem(QtGui.QListWidgetItem):
     def _setIcon(self):
         self.setIcon(QtGui.QIcon(self.filename))
 
-class NavigationLists(QtCore.QObject):
+
+#emits | menuItemClicked(int)
+class NavigationMenu(QtCore.QObject):
     def __init__(self, parent):
         self.parent = parent
         super().__init__(self.parent)
@@ -108,7 +110,7 @@ class NavigationLists(QtCore.QObject):
 
     def listsItemClicked(self, item):
         id = -item.object['id'] if 'screen_name' in item.object else item.object['id']
-        self.emit(QtCore.SIGNAL('listsItemClicked(int)'), id)
+        self.emit(QtCore.SIGNAL('menuItemClicked(int)'), id)
 
     @threaded
     def loadFriends(self):

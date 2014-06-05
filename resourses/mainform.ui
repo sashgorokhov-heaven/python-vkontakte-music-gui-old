@@ -659,7 +659,7 @@ border-bottom-left-radius: 7px;
        <item>
         <widget class="QPushButton" name="downloadButton">
          <property name="text">
-          <string>К загрузке:</string>
+          <string>Ожидают загрузки: 0 </string>
          </property>
          <property name="checkable">
           <bool>false</bool>
@@ -678,20 +678,6 @@ border-bottom-left-radius: 7px;
           </size>
          </property>
         </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="uncheckAllButton">
-         <property name="text">
-          <string>Снять выделение</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="checkAllButton">
-         <property name="text">
-          <string>Выделить все</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </item>
@@ -768,6 +754,7 @@ border-bottom-left-radius: 7px;
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="resourses.qrc"/>
   <include location="resourses.qrc"/>
  </resources>
  <connections/>

@@ -113,7 +113,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QLabel" name="stateLabel">
        <property name="text">
         <string/>
        </property>

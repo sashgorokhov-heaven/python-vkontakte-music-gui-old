@@ -1,6 +1,8 @@
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
+import threading
+
 def showmessage(msg):
     print(str(msg))
 
@@ -35,3 +37,26 @@ class VkAudio:
 
     def __str__(self):
         return '[{0}] {} - {}'.format(':'.join(self.duration(True)), self.artist(), self.title())
+
+
+#колеса
+class Buffer:
+    def __init__(self):
+        self.__lock = threading.Lock()
+        self.__buffer = dict()
+
+    def get(self, key):
+        with self.__lock:
+            return self.__buffer[key]
+
+    def put(self, key, value):
+        with self.__lock:
+            self.__buffer[key] = value
+
+    def remove(self, key):
+        with self.__lock:
+            return self.__buffer.pop(key)
+
+    def __contains__(self, item):
+        with self.__lock:
+            return item in self.__buffer
