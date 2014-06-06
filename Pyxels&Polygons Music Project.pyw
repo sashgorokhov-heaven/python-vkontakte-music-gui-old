@@ -35,7 +35,7 @@ except Exception as e:
     exit(-1)
 
 from modules.forms import mainform
-from PyQt4 import QtGui
+from PySide import QtGui
 
 app = QtGui.QApplication([])
 mform = mainform.MainForm(api.VKApi(access_token))

@@ -1,3 +1,5 @@
+from PySide import QtCore
+
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
@@ -9,6 +11,7 @@ def showmessage(msg):
 class VkAudio:
     def __init__(self, audioobject):
         self.__object = audioobject
+        self.owner_id = None
 
     def id(self):
         return self.__object['id']
@@ -60,3 +63,19 @@ class Buffer:
     def __contains__(self, item):
         with self.__lock:
             return item in self.__buffer
+
+
+class LoadThread(QtCore.QThread):
+    signalEmitter = QtCore.Signal(dict, int, int)
+    def __init__(self, workfunc):
+        super().__init__()
+        self.__workfunc = workfunc
+        self.errorcode = 0
+        self.error = None
+
+    def run(self):
+        try:
+            self.__workfunc(self.signalEmitter)
+        except Exception as e:
+            self.errorcode = 1
+            self.error = e

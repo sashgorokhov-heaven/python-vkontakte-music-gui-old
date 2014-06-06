@@ -1,137 +1,146 @@
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
-from modules.gorokhovlibs.threadeddecor import threaded
 from modules import cacher
-from PyQt4 import QtCore, QtGui
+from PySide import QtCore, QtGui
 import re, os.path
+from modules.util import LoadThread
+
+SLEEPTIME = 150
 
 class UserListItem(QtGui.QListWidgetItem):
     def __init__(self, userobject, api):
         self.object = userobject
         self.filename = str(self.object['id'])+os.path.splitext(self.object['photo_100'])[1]
+        global SLEEPTIME
         if not cacher.exists(self.filename):
-            cacher.put_file(api.download_loop(self.object['photo_100']), self.filename)
+            cacher.put_file(api.download(self.object['photo_100']), self.filename)
+            SLEEPTIME = 150
+        else:
+            SLEEPTIME = 10
         self.filename = cacher.get_file(self.filename)
         text = self.object['first_name']+' '+self.object['last_name']
         super().__init__(text)
-
-    def _setIcon(self):
-        self.setIcon(QtGui.QIcon(self.filename))
 
 class GroupsListItem(QtGui.QListWidgetItem):
     def __init__(self, groupobject, api):
         self.object = groupobject
         self.filename = str(self.object['id'])+os.path.splitext(self.object['photo_100'])[1]
+        global SLEEPTIME
         if not cacher.exists(self.filename):
-            cacher.put_file(api.download_loop(self.object['photo_100']), self.filename)
+            cacher.put_file(api.download(self.object['photo_100']), self.filename)
+            SLEEPTIME = 150
+        else:
+            SLEEPTIME = 10
         self.filename = cacher.get_file(self.filename)
         text = self.object['name']
         super().__init__(text)
 
-    def _setIcon(self):
-        self.setIcon(QtGui.QIcon(self.filename))
-
-
-#emits | menuItemClicked(int)
 class NavigationMenu(QtCore.QObject):
+    menuItemClicked = QtCore.Signal(int)
+
     def __init__(self, parent):
+        super().__init__()
+
         self.parent = parent
-        super().__init__(self.parent)
-        self.set_connections()
-        self.stop = False
-        self.userlist = list()
-        self.friendslist = list()
-        self.groupslist = list()
-        self.loadUser()
-        self.loadFriends()
-        self.loadGroups()
+        self.__stop = False
 
-    def close(self):
-        self.stop = True
+        self.parent.friendsSearchEdit.textChanged.connect(self.__friendsSearchEditChanged)
+        self.parent.groupsSearchEdit.textChanged.connect(self.__groupsSearchEditChanged)
+        self.parent.userList.itemClicked.connect(self.__listsItemClicked)
+        self.parent.groupsList.itemClicked.connect(self.__listsItemClicked)
+        self.parent.friendsList.itemClicked.connect(self.__listsItemClicked)
 
-    def set_connections(self):
-        self.connect(self, QtCore.SIGNAL('setIcons(int, QString)'), self.__setIcon)
-        self.connect(self, QtCore.SIGNAL('loadUserComplete()'), self.loadUserComplete)
-        self.parent.elements.userList.itemClicked.connect(self.listsItemClicked)
-        self.parent.elements.groupsList.itemClicked.connect(self.listsItemClicked)
-        self.parent.elements.friendsList.itemClicked.connect(self.listsItemClicked)
-        self.parent.elements.friendsSearchEdit.textChanged.connect(self.friendsSearchEditChanged)
-        self.parent.elements.groupsSearchEdit.textChanged.connect(self.groupsSearchEditChanged)
-        self.connect(self, QtCore.SIGNAL('setFriendsLoadPbar(int)'), self.parent.elements.friendsLoadPBar.setValue)
-        self.connect(self, QtCore.SIGNAL('setGroupsLoadPbar(int)'), self.parent.elements.groupsLoadPBar.setValue)
+        self.__loadUser()
+        self.__loadFriends()
+        self.__loadGroups()
 
-    def friendsSearchEditChanged(self, line):
+    @QtCore.Slot(GroupsListItem)
+    @QtCore.Slot(UserListItem)
+    def __listsItemClicked(self, item):
+        uid = -item.object['id'] if 'screen_name' in item.object else item.object['id']
+        self.menuItemClicked.emit(uid)
+
+    @QtCore.Slot()
+    def exiting(self):
+        self.__stop = True
+
+    @QtCore.Slot(str)
+    def __friendsSearchEditChanged(self, line):
         if line:
-            count = self.parent.elements.friendsList.count()
+            count = self.parent.friendsList.count()
             for i in range(count):
-                item = self.parent.elements.friendsList.item(i)
+                item = self.parent.friendsList.item(i)
                 if re.match(line.lower(), item.object['first_name'].lower()) or re.match(line.lower(), item.object['last_name'].lower()):
-                    self.parent.elements.friendsList.scrollToItem(item)
+                    self.parent.friendsList.scrollToItem(item)
                     item.setSelected(True)
         else:
-            self.parent.elements.friendsList.scrollToItem(self.parent.elements.friendsList.item(0))
+            self.parent.friendsList.scrollToItem(self.parent.friendsList.item(0))
 
-    def groupsSearchEditChanged(self, line):
+    @QtCore.Slot(str)
+    def __groupsSearchEditChanged(self, line):
         if line:
-            count = self.parent.elements.groupsList.count()
+            count = self.parent.groupsList.count()
             for i in range(count):
-                item = self.parent.elements.groupsList.item(i)
+                item = self.parent.groupsList.item(i)
                 if re.match(line.lower(), item.object['name'].lower()):
-                    self.parent.elements.groupsList.scrollToItem(item)
+                    self.parent.groupsList.scrollToItem(item)
                     item.setSelected(True)
         else:
-            self.parent.elements.groupsList.scrollToItem(self.parent.elements.groupsList.item(0))
+            self.parent.groupsList.scrollToItem(self.parent.groupsList.item(0))
 
-    def setIcon(self, id, listname):
-        self.emit(QtCore.SIGNAL('setIcons(int, QString)'), id, listname)
+    def __loadUser(self):
+        def work(emitter):
+            userobject = self.parent.api.call('users.get', fields='photo_100')[0]
+            emitter.emit(userobject, 0, 0)
+        self.__userLoader = LoadThread(work)
+        self.__userLoader.signalEmitter.connect(self.__loadUserComplete)
+        self.__userLoader.start()
 
-    def __setIcon(self, id, listname):
-        list_ = getattr(self, listname)
-        for itemobject, item in list_:
-            if self.stop:
-                return
-            if itemobject['id'] == id:
-                item.setIcon(QtGui.QIcon(item.filename))
-                break
-
-    @threaded
-    def loadUser(self):
-        userobject = self.parent.api.call('users.get', fields='photo_100')[0]
+    @QtCore.Slot()
+    def __loadUserComplete(self, userobject, n, b):
         item = UserListItem(userobject, self.parent.api)
-        self.parent.elements.userList.addItem(item)
-        self.userlist.append((userobject, item))
-        self.setIcon(userobject['id'], 'userlist')
-        self.emit(QtCore.SIGNAL('loadUserComplete()'))
+        item.setIcon(QtGui.QIcon(item.filename))
+        self.parent.userList.addItem(item)
+        item.setSelected(True)
+        self.__listsItemClicked(item)
 
-    def loadUserComplete(self):
-        self.userlist[-1][1].setSelected(True)
-        self.listsItemClicked(self.userlist[-1][1])
+    def __loadFriends(self):
+        self.__friendsLoader = LoadThread(self.__loadFriendsFunc)
+        self.__friendsLoader.signalEmitter.connect(self.__addFriendSlot)
+        self.__friendsLoader.start()
 
-    def listsItemClicked(self, item):
-        id = -item.object['id'] if 'screen_name' in item.object else item.object['id']
-        self.emit(QtCore.SIGNAL('menuItemClicked(int)'), id)
-
-    @threaded
-    def loadFriends(self):
+    def __loadFriendsFunc(self, emitter):
         friends = self.parent.api.call('friends.get', fields='photo_100', order='hints')['items']
         for n, friendobject in enumerate(friends, 1):
-            if self.stop:
+            if self.__stop:
                 return
-            item = UserListItem(friendobject, self.parent.api)
-            self.parent.elements.friendsList.addItem(item)
-            self.friendslist.append((friendobject, item))
-            self.setIcon(friendobject['id'], 'friendslist')
-            self.emit(QtCore.SIGNAL('setFriendsLoadPbar(int)'), n/len(friends)*100)
+            emitter.emit(friendobject, n, len(friends))
+            QtCore.QThread.msleep(SLEEPTIME)
 
-    @threaded
-    def loadGroups(self):
+    @QtCore.Slot(dict, int, int)
+    def __addFriendSlot(self, friendobject, n, total):
+        item = UserListItem(friendobject, self.parent.api)
+        self.parent.friendsList.addItem(item)
+        item.setIcon(QtGui.QIcon(item.filename))
+        self.parent.friendsLoadPBar.setValue(n/total*100)
+
+    def __loadGroups(self):
+        self.__groupsLoader = LoadThread(self.__loadGroupsFunc)
+        self.__groupsLoader.signalEmitter.connect(self.__addGroupSlot)
+        self.__groupsLoader.start()
+
+    def __loadGroupsFunc(self, emitter):
         groups = self.parent.api.call('groups.get', fields='photo_100', extended=1)['items']
         for n, groupobject in enumerate(groups, 1):
-            if self.stop:
+            if self.__stop:
                 return
-            item = GroupsListItem(groupobject, self.parent.api)
-            self.parent.elements.groupsList.addItem(item)
-            self.groupslist.append((groupobject, item))
-            self.setIcon(groupobject['id'], 'groupslist')
-            self.emit(QtCore.SIGNAL('setGroupsLoadPbar(int)'), n/len(groups)*100)
+            emitter.emit(groupobject, n, len(groups))
+            QtCore.QThread.msleep(SLEEPTIME)
+
+    @QtCore.Slot(dict, int, int)
+    def __addGroupSlot(self, groupobject, n, total):
+        item = GroupsListItem(groupobject, self.parent.api)
+        self.parent.groupsList.addItem(item)
+        item.setIcon(QtGui.QIcon(item.filename))
+        self.parent.groupsLoadPBar.setValue(n/total*100)

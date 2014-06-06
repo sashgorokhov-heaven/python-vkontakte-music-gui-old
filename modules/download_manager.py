@@ -5,35 +5,37 @@ import threading
 from modules import util
 from modules.gorokhovlibs.threadeddecor import threaded
 import time
-from modules.gorokhovlibs.qt import qtwindow
-import os.path
-from PyQt4 import QtGui, QtCore, uic
+from PySide import QtGui, QtCore
+from modules.forms.ui.loadform import Ui_Form as UI_DownloadWidget
+from modules.forms.ui.audiodownloadwidget import Ui_Form as UI_DownloadWidgetItem
 
 
-class AudioDownloadWidgetItem(QtGui.QWidget):
+class AudioDownloadWidgetItem(QtGui.QWidget, UI_DownloadWidgetItem):
     def __init__(self, vkaudio, parent, item):
+        super().__init__()
         self.vkaudio = vkaudio
         self.parent = parent
         self.item = item
-        super().__init__()
-        uic.loadUi(os.path.join('resourses', 'audiodownloadwidget.ui'), self)
+        self.setupUi(self)
         self.item.setSizeHint(self.sizeHint())
-        setattr(self, 'elements', qtwindow._Elements(qtwindow.BaseQtWindow._set_childs(None, self)))
-        self.elements.titleLabel.setText(vkaudio.title())
-        self.elements.artistLabel.setText(vkaudio.artist())
+        self.titleLabel.setText(vkaudio.title())
+        self.artistLabel.setText(vkaudio.artist())
 
     def doubleClicked(self):
-        self.emit(QtCore.SIGNAL('updateState(int, int)'), self.vkaudio.id(), 4)
-        self.parent.elements.downloadListWidget.takeItem(self.parent.elements.downloadListWidget.row(self.item))
+        self.parent.updateState.emit(self.vkaudio, 4)
+        self.parent.downloadListWidget.takeItem(self.parent.downloadListWidget.row(self.item))
 
     def mouseDoubleClickEvent(self, event):
         self.doubleClicked()
 
-class AudioDownloadWidget(qtwindow.BaseQtWindow):
+class AudioDownloadWidget(QtGui.QWidget, UI_DownloadWidget):
+    updateState = QtCore.Signal(util.VkAudio, int)
+
     def __init__(self, parent):
-        super().__init__(self, os.path.join('resourses', 'loadform.ui'))
+        super().__init__()
+        self.setupUi(self)
         self.parent = parent
-        self.stop = False
+        self.__stop = False
         self.loading = False
         self.audiolist = list()
         self.pauseLock = threading.Lock()
@@ -43,98 +45,82 @@ class AudioDownloadWidget(qtwindow.BaseQtWindow):
         self.hide()
         self.download_loop()
         self.hideLabels()
-        self.elements.statusLabel.setText('Ожидание')
+        self.statusLabel.setText('Ожидание')
+        self.startButton.clicked.connect(self.startButtonClicked)
+        self.pauseButton.clicked.connect(self.pauseButtonClicked)
 
+    @QtCore.Slot()
     def hideLabels(self):
-        self.elements.titleLabel.setVisible(False)
-        self.elements.sepLabel.setVisible(False)
-        self.elements.artistLabel.setVisible(False)
+        self.titleLabel.setVisible(False)
+        self.sepLabel.setVisible(False)
+        self.artistLabel.setVisible(False)
 
+    @QtCore.Slot()
     def showLabels(self):
-        self.elements.titleLabel.setVisible(True)
-        self.elements.sepLabel.setVisible(True)
-        self.elements.artistLabel.setVisible(True)
+        self.titleLabel.setVisible(True)
+        self.sepLabel.setVisible(True)
+        self.artistLabel.setVisible(True)
 
     def closeEvent(self, event):
         self.hide()
 
-    def close(self):
-        self.stop = True
+    @QtCore.Slot()
+    def exiting(self):
+        self.__stop = True
 
+    @QtCore.Slot()
     def show(self):
         self._setVisible(True)
 
+    @QtCore.Slot()
     def hide(self):
         self._setVisible(False)
 
-    def add(self, aid):
-        vkaudio = self.parent.buffer.remove(aid)
-        assert isinstance(vkaudio, util.VkAudio)
+    @QtCore.Slot(util.VkAudio)
+    def add(self, vkaudio):
         item = QtGui.QListWidgetItem()
         widget = AudioDownloadWidgetItem(vkaudio, self, item)
-        self.elements.downloadListWidget.addItem(item)
-        self.elements.downloadListWidget.setItemWidget(item, widget)
+        self.downloadListWidget.addItem(item)
+        self.downloadListWidget.setItemWidget(item, widget)
         self.updateButton('Ожидают загрузки')
 
     def updateButton(self, text):
-        self.parent.elements.downloadButton.setText('{}: {}'.format(text, self.downloadListWidget.count()))
+        self.parent.downloadButton.setText('{}: {}'.format(text, self.downloadListWidget.count()))
 
     def _setVisible(self, visible):
         self.visible = visible
         self.setVisible(visible)
 
-    def _set_connections(self):
-        self.elements.startButton.clicked.connect(self.startButtonClicked)
-        self.elements.pauseButton.clicked.connect(self.pauseButtonClicked)
-        self.connect(self, QtCore.SIGNAL('work()'), self.__work)
-
     def startButtonClicked(self):
         self.pauseLock.release()
-        self.elements.startButton.setEnabled(False)
-        self.elements.pauseButton.setEnabled(True)
+        self.startButton.setEnabled(False)
+        self.pauseButton.setEnabled(True)
 
     @threaded
     def download_loop(self):
-        while not self.stop:
+        while not self.__stop:
             time.sleep(1)
-            while self.elements.downloadListWidget.count()>0:
+            while self.downloadListWidget.count()>0:
                 time.sleep(0.5)
                 with self.pauseLock:
                     self.showLabels()
-                    self.elements.statusLabel.setText('Загружается')
-                    vkaudio = self.getVkaudio()
-                    self.emit(QtCore.SIGNAL('updateState(int, int)'), vkaudio.id(), 1)
+                    self.statusLabel.setText('Загружается')
+                    item = self.downloadListWidget.item(0)
+                    widget = self.downloadListWidget.itemWidget(item)
+                    self.titleLabel.setText(widget.vkaudio.title())
+                    self.artistLabel.setText(widget.vkaudio.artist())
+                    vkaudio = widget.vkaudio
+                    self.updateState.emit(vkaudio, 1)
                     try:
                         self.download(vkaudio)
                     except Exception as e:
                         print(e)
-                        self.emit(QtCore.SIGNAL('updateState(int, int)'), vkaudio.id(), 3)
-                    #widget.doubleClicked()
+                        self.updateState.emit(vkaudio, 3)
                     else:
-                        self.emit(QtCore.SIGNAL('updateState(int, int)'), vkaudio.id(), 2)
+                        self.updateState.emit(vkaudio, 2)
                     self.updateButton('Ожидают загрузки')
-            self.elements.statusLabel.setText('Ожидание')
+            self.statusLabel.setText('Ожидание')
             self.hideLabels()
-
-    def __work(self):
-        with self.worklock2:
-            item = self.elements.downloadListWidget.takeItem(0)
-            widget = self.elements.downloadListWidget.itemWidget(item)
-            self.elements.titleLabel.setText(widget.vkaudio.title())
-            self.elements.artistLabel.setText(widget.vkaudio.artist())
-            self.parent.buffer.put('object', widget.vkaudio)
-
-    def getVkaudio(self):
-        self.emit(QtCore.SIGNAL('work()'))
-        time.sleep(1)
-
-        self.worklock2.acquire()
-        self.worklock2.release()
-
-        return self.parent.buffer.remove('object')
-
-
-
 
     def download(self, vkaudio):
         self.parent.api.download(vkaudio.url(),str(vkaudio.id())+'.mp3')
@@ -143,4 +129,3 @@ class AudioDownloadWidget(qtwindow.BaseQtWindow):
         self.pauseLock.acquire()
         self.elements.startButton.setEnabled(True)
         self.elements.pauseButton.setEnabled(False)
-        pass
