@@ -28,6 +28,7 @@ class AudioDownloadWidgetItem(QtGui.QWidget, UI_DownloadWidgetItem):
     def mouseDoubleClickEvent(self, event):
         self.doubleClicked()
 
+
 class AudioDownloadWidget(QtGui.QWidget, UI_DownloadWidget):
     updateState = QtCore.Signal(util.VkAudio, int)
 
@@ -105,7 +106,7 @@ class AudioDownloadWidget(QtGui.QWidget, UI_DownloadWidget):
                 with self.pauseLock:
                     self.showLabels()
                     self.statusLabel.setText('Загружается')
-                    item = self.downloadListWidget.item(0)
+                    item = self.downloadListWidget.takeItem(0)
                     widget = self.downloadListWidget.itemWidget(item)
                     self.titleLabel.setText(widget.vkaudio.title())
                     self.artistLabel.setText(widget.vkaudio.artist())
