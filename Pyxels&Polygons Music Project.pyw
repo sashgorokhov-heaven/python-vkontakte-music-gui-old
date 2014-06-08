@@ -38,8 +38,6 @@ from modules.forms import mainform
 from PySide import QtGui
 
 app = QtGui.QApplication([])
-#from modules import waiter
-#waiter.show()
 mform = mainform.MainForm(api.VKApi(access_token))
 mform.show()
 app.exec_()
