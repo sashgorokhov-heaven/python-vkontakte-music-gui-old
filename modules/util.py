@@ -3,10 +3,14 @@ from PySide import QtCore
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
-import threading
+import threading, re
 
 def showmessage(msg):
     print(str(msg))
+
+def getValidFilename(filename):
+    regexp = re.compile(r"[0-9a-zA-ZА-Яа-я\-\(\)\.\' ]")
+    return ''.join(i for i in filename if re.match(regexp, i))[:100]
 
 class VkAudio:
     def __init__(self, audioobject):
@@ -40,7 +44,6 @@ class VkAudio:
 
     def __str__(self):
         return '[{0}] {} - {}'.format(':'.join(self.duration(True)), self.artist(), self.title())
-
 
 #колеса
 class Buffer:
@@ -79,3 +82,6 @@ class LoadThread(QtCore.QThread):
         except Exception as e:
             self.errorcode = 1
             self.error = e
+
+if __name__=='__main__':
+    print(getValidFilename("D. Guetta ft. Lil Wayne - my bombs (jetty's remix)"))

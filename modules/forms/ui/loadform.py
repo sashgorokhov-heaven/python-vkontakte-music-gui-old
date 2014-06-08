@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'loadform.ui'
 #
-# Created: Thu Jun  5 21:52:17 2014
+# Created: Sat Jun  7 17:28:41 2014
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -20,8 +20,8 @@ class Ui_Form(object):
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.progressBar = QtGui.QProgressBar(Form)
-        self.progressBar.setStyleSheet("QProgressBar {\n"
+        self.downloadPBar = QtGui.QProgressBar(Form)
+        self.downloadPBar.setStyleSheet("QProgressBar {\n"
 "padding: 1px;\n"
 "border-color: rgb(36, 36, 36);\n"
 "background: rgb(213, 215, 255);\n"
@@ -29,10 +29,10 @@ class Ui_Form(object):
 "QProgressBar::chunk {\n"
 "background: rgb(170, 170, 255)\n"
 "}")
-        self.progressBar.setProperty("value", 24)
-        self.progressBar.setTextVisible(False)
-        self.progressBar.setObjectName("progressBar")
-        self.verticalLayout.addWidget(self.progressBar)
+        self.downloadPBar.setProperty("value", 24)
+        self.downloadPBar.setTextVisible(False)
+        self.downloadPBar.setObjectName("downloadPBar")
+        self.verticalLayout.addWidget(self.downloadPBar)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setContentsMargins(20, 0, 20, -1)
         self.horizontalLayout.setObjectName("horizontalLayout")

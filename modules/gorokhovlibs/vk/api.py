@@ -39,11 +39,11 @@ class VKApi:
             raise VKError(response['error'])
         return response['response']
 
-    def download(self, link, filename=None):
+    def download(self, link, filename=None, reportHook=None):
         if filename:
-            urllib.request.urlretrieve(link, filename)
+            urllib.request.urlretrieve(link, filename, reportHook)
         else:
-            return urllib.request.urlretrieve(link)[0]
+            return urllib.request.urlretrieve(link, reporthook=reportHook)[0]
 
     def upload(self, link, filename, res_type):
         response = requests.post(link, files={res_type: open(filename, 'rb')}).json()

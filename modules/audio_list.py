@@ -115,7 +115,7 @@ class AudioListWidget(QtCore.QObject):
                 if self.__stop:
                     return
                 emitter.emit(vkobject, 0, 0)
-                QtCore.QThread.msleep(60)
+                QtCore.QThread.msleep(100)
 
     @QtCore.Slot(dict, int, int)
     def __addAudioItemSlot(self, vkobject, n, p):

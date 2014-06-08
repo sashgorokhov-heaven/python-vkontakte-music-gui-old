@@ -1,3 +1,6 @@
+import os
+import sys
+
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
@@ -7,19 +10,12 @@ from modules.gorokhovlibs.threadeddecor import threaded
 import time
 from PySide import QtGui, QtCore
 from modules.forms.ui.loadform import Ui_Form as UI_DownloadWidget
-from modules.forms.ui.audiodownloadwidget import Ui_Form as UI_DownloadWidgetItem
 
-
-class AudioDownloadWidgetItem(QtGui.QWidget, UI_DownloadWidgetItem):
-    def __init__(self, vkaudio, parent, item):
-        super().__init__()
+class AudioDownloadWidgetItem(QtGui.QListWidgetItem):
+    def __init__(self, vkaudio, parent):
+        super().__init__('{} - {}'.format(vkaudio.artist(), vkaudio.title()))
         self.vkaudio = vkaudio
         self.parent = parent
-        self.item = item
-        self.setupUi(self)
-        self.item.setSizeHint(self.sizeHint())
-        self.titleLabel.setText(vkaudio.title())
-        self.artistLabel.setText(vkaudio.artist())
 
     def doubleClicked(self):
         self.parent.updateState.emit(self.vkaudio, 4)
@@ -31,6 +27,7 @@ class AudioDownloadWidgetItem(QtGui.QWidget, UI_DownloadWidgetItem):
 
 class AudioDownloadWidget(QtGui.QWidget, UI_DownloadWidget):
     updateState = QtCore.Signal(util.VkAudio, int)
+    __setDownloadBarValue = QtCore.Signal(int)
 
     def __init__(self, parent):
         super().__init__()
@@ -43,12 +40,15 @@ class AudioDownloadWidget(QtGui.QWidget, UI_DownloadWidget):
         self.pauseLock.acquire()
         self.worklock1 = threading.Lock()
         self.worklock2 = threading.Lock()
+        self.firstshow = True
         self.hide()
         self.download_loop()
+        self.uploaddir = os.path.split(sys.argv[0])[0]
         self.hideLabels()
         self.statusLabel.setText('Ожидание')
         self.startButton.clicked.connect(self.startButtonClicked)
         self.pauseButton.clicked.connect(self.pauseButtonClicked)
+        self.__setDownloadBarValue.connect(self.downloadPBar.setValue)
 
     @QtCore.Slot()
     def hideLabels(self):
@@ -63,15 +63,25 @@ class AudioDownloadWidget(QtGui.QWidget, UI_DownloadWidget):
         self.artistLabel.setVisible(True)
 
     def closeEvent(self, event):
+        if self.__stop:
+            event.accept()
         self.hide()
 
     @QtCore.Slot()
     def exiting(self):
         self.__stop = True
+        self.close()
 
     @QtCore.Slot()
     def show(self):
+        if self.firstshow:
+            ndir = QtGui.QFileDialog.getExistingDirectory(self, 'Папка для загрузки', self.uploaddir, QtGui.QFileDialog.ShowDirsOnly)
+            if ndir:
+                self.uploaddir = ndir
+            self.firstshow = False
+        self.__setDownloadBarValue.emit(0)
         self._setVisible(True)
+
 
     @QtCore.Slot()
     def hide(self):
@@ -79,10 +89,8 @@ class AudioDownloadWidget(QtGui.QWidget, UI_DownloadWidget):
 
     @QtCore.Slot(util.VkAudio)
     def add(self, vkaudio):
-        item = QtGui.QListWidgetItem()
-        widget = AudioDownloadWidgetItem(vkaudio, self, item)
+        item = AudioDownloadWidgetItem(vkaudio, self)
         self.downloadListWidget.addItem(item)
-        self.downloadListWidget.setItemWidget(item, widget)
         self.updateButton('Ожидают загрузки')
 
     def updateButton(self, text):
@@ -107,10 +115,9 @@ class AudioDownloadWidget(QtGui.QWidget, UI_DownloadWidget):
                     self.showLabels()
                     self.statusLabel.setText('Загружается')
                     item = self.downloadListWidget.takeItem(0)
-                    widget = self.downloadListWidget.itemWidget(item)
-                    self.titleLabel.setText(widget.vkaudio.title())
-                    self.artistLabel.setText(widget.vkaudio.artist())
-                    vkaudio = widget.vkaudio
+                    self.titleLabel.setText(item.vkaudio.title())
+                    self.artistLabel.setText(item.vkaudio.artist())
+                    vkaudio = item.vkaudio
                     self.updateState.emit(vkaudio, 1)
                     try:
                         self.download(vkaudio)
@@ -124,9 +131,21 @@ class AudioDownloadWidget(QtGui.QWidget, UI_DownloadWidget):
             self.hideLabels()
 
     def download(self, vkaudio):
-        self.parent.api.download(vkaudio.url(),str(vkaudio.id())+'.mp3')
+        self.__setDownloadBarValue.emit(0)
+        def reportHook(transfered, block_size, total_size):
+            self.__setDownloadBarValue.emit(round(((transfered*block_size)/total_size)*100))
+        self.parent.api.download(
+            vkaudio.url(),
+            os.path.join(
+                self.uploaddir,
+                util.getValidFilename(
+                    '{} - {}'.format(vkaudio.artist(),
+                                     vkaudio.title())+'.mp3')
+            ),
+            reportHook)
+        self.__setDownloadBarValue.emit(100)
 
     def pauseButtonClicked(self):
         self.pauseLock.acquire()
-        self.elements.startButton.setEnabled(True)
-        self.elements.pauseButton.setEnabled(False)
+        self.startButton.setEnabled(True)
+        self.pauseButton.setEnabled(False)

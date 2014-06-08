@@ -17,7 +17,7 @@ class UserListItem(QtGui.QListWidgetItem):
             cacher.put_file(api.download(self.object['photo_100']), self.filename)
             SLEEPTIME = 150
         else:
-            SLEEPTIME = 10
+            SLEEPTIME = 50
         self.filename = cacher.get_file(self.filename)
         text = self.object['first_name']+' '+self.object['last_name']
         super().__init__(text)
@@ -31,7 +31,7 @@ class GroupsListItem(QtGui.QListWidgetItem):
             cacher.put_file(api.download(self.object['photo_100']), self.filename)
             SLEEPTIME = 150
         else:
-            SLEEPTIME = 10
+            SLEEPTIME = 50
         self.filename = cacher.get_file(self.filename)
         text = self.object['name']
         super().__init__(text)
@@ -115,8 +115,8 @@ class NavigationMenu(QtCore.QObject):
         for n, friendobject in enumerate(friends, 1):
             if self.__stop:
                 return
-            emitter.emit(friendobject, n, len(friends))
             QtCore.QThread.msleep(SLEEPTIME)
+            emitter.emit(friendobject, n, len(friends))
 
     @QtCore.Slot(dict, int, int)
     def __addFriendSlot(self, friendobject, n, total):
@@ -135,8 +135,8 @@ class NavigationMenu(QtCore.QObject):
         for n, groupobject in enumerate(groups, 1):
             if self.__stop:
                 return
-            emitter.emit(groupobject, n, len(groups))
             QtCore.QThread.msleep(SLEEPTIME)
+            emitter.emit(groupobject, n, len(groups))
 
     @QtCore.Slot(dict, int, int)
     def __addGroupSlot(self, groupobject, n, total):
