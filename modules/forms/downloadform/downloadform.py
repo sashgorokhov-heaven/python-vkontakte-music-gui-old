@@ -9,7 +9,7 @@ from modules import util
 from modules.gorokhovlibs.threadeddecor import threaded
 import time
 from PySide import QtGui, QtCore
-from modules.forms.ui.loadform import Ui_Form as UI_DownloadWidget
+from modules.forms.downloadform.ui import Ui_Form as UI_DownloadWidget
 
 class AudioDownloadWidgetItem(QtGui.QListWidgetItem):
     def __init__(self, vkaudio, parent):
