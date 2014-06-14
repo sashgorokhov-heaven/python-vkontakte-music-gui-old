@@ -38,7 +38,7 @@ class __QtAuthWindow(QtWebKit.QWebView):
 
 def show_browser(appId, scope):
     app = QtGui.QApplication([])
-    form = __QtAuthWindow(appId, scope)
+    form = __QtAuthWindow(str(appId), scope)
     form.show()
     app.exec_()
     return form.accessToken, form.userId, form.expires

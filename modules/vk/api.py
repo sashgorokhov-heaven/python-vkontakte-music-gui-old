@@ -1,38 +1,48 @@
 __author__ = "Alexander Gorokhov"
 __email__ = "sashgorokhov@gmail.com"
+import urllib.request, urllib.parse, json, threading
 
-import urllib.request, urllib.parse, requests, json
+__enable_requests__ = True
+try:
+    import requests
+except ImportError:
+    __enable_requests__ = False
 
 
 class VKError(Exception):
     def __init__(self, error):
         super().__init__(error)
-        self.error = error
+        self.vkerror = error
+        self.error_code = int(error['error_code'])
+        self.error_msg = str(error['error_msg'])
+        self.request_params = error['request_params']
 
 
 class VKApi:
     def __init__(self, access_token=None):
-        self.token = access_token
+        self.access_token = access_token
         self.api_version = '5.21'
+        self._lock = threading.Lock()
 
-    def __compile_params(self, params_dict):
+    def _compile_params(self, params_dict):
         params = list()
         for key in params_dict:
             if len(str(params_dict[key])) != 0:
                 if isinstance(params_dict[key], list):
-                    params.append((key, ','.join(params_dict[key])))
+                    params.append((key, ','.join(map(str, params_dict[key]))))
                 else:
-                    params.append((key, params_dict[key]))
-        if self.token:
-            params.append(("access_token", self.token))
-        params.append(('v', self.api_version))
+                    params.append((key, str(params_dict[key])))
+        if self.access_token:
+            params.append(("access_token", str(self.access_token)))
+        params.append(('v', str(self.api_version)))
         return params
 
     def call(self, method, **params_dict):
-        params = self.__compile_params(params_dict)
+        params = self._compile_params(params_dict)
 
         url = 'https://api.vk.com/method/{0}?{1}'.format(method, urllib.parse.urlencode(params))
-        response = urllib.request.urlopen(url).read()
+        with self._lock:
+            response = urllib.request.urlopen(url).read()
         response = json.loads(response.decode())
 
         if 'error' in response:
@@ -46,8 +56,11 @@ class VKApi:
             return urllib.request.urlretrieve(link, reporthook=reportHook)[0]
 
     def upload(self, link, filename, res_type):
-        response = requests.post(link, files={res_type: open(filename, 'rb')}).json()
-        return response
+        if __enable_requests__:
+            response = requests.post(link, files={res_type: open(filename, 'rb')}).json()
+            return response
+        else:
+            raise RuntimeError('api.upload(): Requests are disabled(import error)')
 
 
 def test_connection(access_token):

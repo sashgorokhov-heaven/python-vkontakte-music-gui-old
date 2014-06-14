@@ -15,7 +15,8 @@ class MainForm(QtGui.QWidget, Ui_Form):
     def __init__(self, api):
         self.api = api
         super().__init__()
-        self.setupUi(self)
+        self.ui = self.setupUi(self)
+
         self.setWindowTitle(str(constants.application_title))
 
         self.navigation_menu = navmenu.NavigationMenu(self)
