@@ -2,7 +2,13 @@ __author__ = "Alexander Gorokhov"
 __email__ = "sashgorokhov@gmail.com"
 
 import http.cookiejar, urllib.request, urllib.parse, html.parser
-from vk import accesstokener
+from . import accesstokener
+
+_noqt = False
+try:
+    import PySide
+except ImportError:
+    _noqt = True
 
 def quickauth_qt(appid, permissions_scope=list()):
     access_token = user_id = expires_in = None
@@ -135,3 +141,7 @@ def auth(login, passwd, appid, scope):
         raise VKAuthError('Missing some values in answer')
 
     return answer['access_token'], answer['user_id'], answer['expires_in']
+
+# :)
+if _noqt:
+    del globals()['quickauth_qt']

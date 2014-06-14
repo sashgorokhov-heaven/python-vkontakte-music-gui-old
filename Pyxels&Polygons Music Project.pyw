@@ -9,21 +9,9 @@ except ImportError as e:
     logger.write('Import error: {}'.format(str(e)))
     exit(-1)
 
-from modules import constants, util
-from modules.gorokhovlibs.vk import accesstokener, api
+from modules import constants, util, vk
 
-access_token = user_id = expires = None
-if not accesstokener.good():
-    from modules.gorokhovlibs.vk.qt import auth
-    from modules import cacher
-    auth.DESCTIPTION = constants.application_title
-    access_token, user_id, expires = auth.show_browser(constants.application_id, constants.permissions_scope)
-    if not access_token:
-        exit(-1)
-    accesstokener.new(access_token, user_id, expires)
-    cacher.clear()
-else:
-    access_token, user_id, expires = accesstokener.get()
+access_token, user_id, expires = vk.quickauth_qt(constants.application_id, constants.permissions_scope)
 
 try:
     if not access_token or (access_token and not api.test_connection(access_token)):

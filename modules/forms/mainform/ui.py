@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainform.ui'
 #
-# Created: Sat Jun  7 17:28:42 2014
+# Created: Sat Jun 14 20:21:53 2014
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -325,4 +325,5 @@ class Ui_Form(object):
         self.downloadButton.setText(QtGui.QApplication.translate("Form", "Ожидают загрузки: 0 ", None, QtGui.QApplication.UnicodeUTF8))
 
 from PySide import phonon
-import resourses.resourses_rc
+import resourses_rc
+import resourses_rc
