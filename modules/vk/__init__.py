@@ -13,7 +13,7 @@ except ImportError:
 def quickauth_qt(appid, permissions_scope=list()):
     access_token = user_id = expires_in = None
     if not accesstokener.good():
-        from vk.qt.auth import show_browser
+        from .qt.auth import show_browser
         access_token, user_id, expires_in = show_browser(appid, permissions_scope)
         if access_token:
             accesstokener.new(access_token, user_id, expires_in)

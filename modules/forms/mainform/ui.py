@@ -325,5 +325,4 @@ class Ui_Form(object):
         self.downloadButton.setText(QtGui.QApplication.translate("Form", "Ожидают загрузки: 0 ", None, QtGui.QApplication.UnicodeUTF8))
 
 from PySide import phonon
-import resourses_rc
-import resourses_rc
+import resourses.resourses_rc

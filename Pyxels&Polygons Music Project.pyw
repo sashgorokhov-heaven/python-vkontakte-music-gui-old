@@ -10,6 +10,7 @@ except ImportError as e:
     exit(-1)
 
 from modules import constants, util, vk
+from modules.vk import api
 
 access_token, user_id, expires = vk.quickauth_qt(constants.application_id, constants.permissions_scope)
 
@@ -19,7 +20,7 @@ try:
         accesstokener.clear()
         exit(-1)
 except Exception as e:
-    logger.write('Seems like internet connection error')
+    logger.write('Seems like internet connection error: {}'.format(e))
     exit(-1)
 
 from modules.forms import mainform

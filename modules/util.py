@@ -68,20 +68,23 @@ class Buffer:
             return item in self.__buffer
 
 
-class LoadThread(QtCore.QThread):
-    signalEmitter = QtCore.Signal(dict, int, int)
-    def __init__(self, workfunc):
+class ThreadedWorker(QtCore.QThread):
+    def __init__(self, **kwargs):
         super().__init__()
-        self.__workfunc = workfunc
-        self.errorcode = 0
-        self.error = None
+        self._result = None
+        self._lock = threading.Lock()
+        self._kwargs = kwargs
 
     def run(self):
-        try:
-            self.__workfunc(self.signalEmitter)
-        except Exception as e:
-            self.errorcode = 1
-            self.error = e
+        with self._lock:
+            self._result = self._workfunc()
 
-if __name__=='__main__':
+    def _workfunc(self):
+        raise NotImplementedError
+
+    def get_result(self):
+        with self._lock:
+            return self._result
+
+if __name__ == '__main__':
     print(getValidFilename("D. Guetta ft. Lil Wayne - my bombs (jetty's remix)"))
