@@ -2,9 +2,8 @@ __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
 from PySide import QtCore, QtGui
-import threading
 from modules import cacher, util
-import os.path
+import os.path, re, threading
 
 
 class _FriendsListItem(QtGui.QListWidgetItem):
@@ -19,7 +18,6 @@ class _FriendsListItem(QtGui.QListWidgetItem):
 class _FriendsListWorker(util.ThreadedWorker):
     def _workfunc(self):
         friends_vkobject = self._kwargs['api'].call('friends.get', fields='photo_100', order='hints')['items']
-        #friends_vkobject.reverse()
         for n, friend_vkobject in enumerate(friends_vkobject, 1):
             filename = str(friend_vkobject['id'])+os.path.splitext(friend_vkobject['photo_100'])[1]
             if not cacher.exists(filename):
@@ -39,7 +37,8 @@ class FriendsList(QtCore.QObject):
         self._dispatcher = dispatcher
         self._exiting = False
 
-        self.ui.friendsList.itemClicked.connect(self._friendsList_itemclicked)
+        self.ui.friendsList.itemDoubleClicked.connect(self._friendsList_itemclicked)
+        self.ui.friendsSearchEdit.textChanged.connect(self._friendssearch_editchanged)
         self._addfriend_signal.connect(self._addfriend)
         self._add_friends()
 
@@ -73,3 +72,15 @@ class FriendsList(QtCore.QObject):
     @QtCore.Slot()
     def _work_complete(self):
         self.ui.friendsLoadPBar.setValue(100)
+
+    @QtCore.Slot(str)
+    def _friendssearch_editchanged(self, line):
+        if line:
+            count = self.ui.friendsList.count()
+            for i in range(count):
+                item = self.ui.friendsList.item(i)
+                if re.match(line.lower(), item.vkobject['first_name'].lower()) or re.match(line.lower(), item.vkobject['last_name'].lower()):
+                    self.ui.friendsList.scrollToItem(item)
+                    item.setSelected(True)
+        else:
+            self.ui.friendsList.scrollToItem(self.ui.friendsList.item(0))

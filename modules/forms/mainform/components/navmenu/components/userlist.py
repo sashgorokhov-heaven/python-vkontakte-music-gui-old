@@ -36,7 +36,7 @@ class UserList(QtCore.QObject):
         self._dispatcher = dispatcher
         self._exiting = False
 
-        self.ui.userList.itemClicked.connect(self._userlist_itemclicked)
+        self.ui.userList.itemDoubleClicked.connect(self._userlist_itemclicked)
 
         self._add_user()
         #self.add_recomendations()
