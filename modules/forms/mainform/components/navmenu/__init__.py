@@ -16,17 +16,17 @@ class NavigationMenu(QtCore.QObject):
         self._exiting_signal.connect(self._dispatcher.terminate)
         self._dispatcher.start()
 
-        self.user_list = UserList(self.ui, self._api, self._dispatcher)
-        self._exiting_signal.connect(self.user_list.exiting)
-        self.user_list.userlist_itemclicked.connect(self._menu_itemclicked)
+        self._user_list = UserList(self.ui, self._api, self._dispatcher)
+        self._exiting_signal.connect(self._user_list.exiting)
+        self._user_list.userlist_itemclicked.connect(self._menu_itemclicked)
 
-        self.friends_list = FriendsList(self.ui, self._api, self._dispatcher)
-        self._exiting_signal.connect(self.friends_list.exiting)
-        self.friends_list.friendslist_itemclicked.connect(self._menu_itemclicked)
+        self._friends_list = FriendsList(self.ui, self._api, self._dispatcher)
+        self._exiting_signal.connect(self._friends_list.exiting)
+        self._friends_list.friendslist_itemclicked.connect(self._menu_itemclicked)
 
-        self.groups_list = GroupsList(self.ui, self._api, self._dispatcher)
-        self._exiting_signal.connect(self.groups_list.exiting)
-        self.groups_list.groupslist_itemclicked.connect(self._menu_itemclicked)
+        self._groups_list = GroupsList(self.ui, self._api, self._dispatcher)
+        self._exiting_signal.connect(self._groups_list.exiting)
+        self._groups_list.groupslist_itemclicked.connect(self._menu_itemclicked)
 
     @QtCore.Slot(int)
     def _menu_itemclicked(self, uid):
