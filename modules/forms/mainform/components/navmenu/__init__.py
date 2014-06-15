@@ -2,7 +2,8 @@ from PySide import QtGui, QtCore
 from modules.forms.mainform.components.navmenu.components.userlist import UserList
 from modules.forms.mainform.components.navmenu.components.friendslist import FriendsList
 from modules.forms.mainform.components.navmenu.components.groupslist import GroupsList
-from modules.forms.mainform.components.navmenu.components import Dispatcher
+from modules.util import Dispatcher
+
 
 class NavigationMenu(QtCore.QObject):
     _exiting_signal = QtCore.Signal()
