@@ -1,5 +1,6 @@
 from PySide import QtGui, QtCore
 from modules.forms.mainform.components.navmenu.components.userlist import UserList
+from modules.forms.mainform.components.navmenu.components.friendslist import FriendsList
 from modules.forms.mainform.components.navmenu.components import Dispatcher
 
 class NavigationMenu(QtCore.QObject):
@@ -16,6 +17,10 @@ class NavigationMenu(QtCore.QObject):
 
         self.user_list = UserList(self.ui, self._api, self._dispatcher)
         self._exiting_signal.connect(self.user_list.exiting)
+        self.user_list.userlist_itemclicked.connect(self._menu_itemclicked)
+
+        self.friends_list = FriendsList(self.ui, self._api, self._dispatcher)
+        self._exiting_signal.connect(self.friends_list.exiting)
         self.user_list.userlist_itemclicked.connect(self._menu_itemclicked)
 
     @QtCore.Slot(int)

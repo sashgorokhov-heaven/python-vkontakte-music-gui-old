@@ -17,28 +17,34 @@ class Dispatcher(QtCore.QThread):
         self._results = dict() # ID -> result
         self._take_signal.connect(self._take)
         self._condition = threading.Condition()
+        self._wait_condition = threading.Condition()
 
     def addTask(self, run_func, data=None, ID:int=None):
         with self._lock:
             self._queque.append((run_func, data, ID))
+            self._wait_condition.acquire()
+            self._wait_condition.notify()
+            self._wait_condition.release()
 
     @QtCore.Slot()
     def _take(self):
         with self._lock:
-            run_func, data, ID = self._queque.pop()
+            run_func, data, ID = self._queque.pop(0)
             if ID is not None:
-                self._results[ID] = run_func(data) if data is not None else run_func()
+                self._results[ID] = run_func(*data) if data is not None else run_func()
             else:
-                _ = run_func(data) if data is not None else run_func()
+                _ = run_func(*data) if data is not None else run_func()
             self._condition.acquire()
             self._condition.notify()
             self._condition.release()
 
     def run(self):
         while True:
-            self.msleep(100)
+            self._wait_condition.acquire()
+            self._wait_condition.wait()
+            self._wait_condition.release()
             while len(self._queque)>0:
-                self.msleep(self._worksleep)
+                #self.msleep(self._worksleep)
                 self._take_signal.emit()
                 self._condition.acquire()
                 self._condition.wait()

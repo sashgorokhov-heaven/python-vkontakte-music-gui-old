@@ -57,7 +57,7 @@ class UserList(QtCore.QObject):
     @QtCore.Slot()
     def _work_complete(self):
         if self._exiting: return
-        self._dispatcher.addTask(UserList._gui_work, self)
+        self._dispatcher.addTask(UserList._gui_work, (self, ))
 
     @staticmethod
     def _gui_work(self):
