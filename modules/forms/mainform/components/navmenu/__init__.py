@@ -8,14 +8,12 @@ from modules.util import Dispatcher
 class NavigationMenu(QtCore.QObject):
     _exiting_signal = QtCore.Signal()
     menu_itemclicked = QtCore.Signal(int)
-    def __init__(self, parentform_ui, api):
+    def __init__(self, parentform_ui, api, dispatcher):
         super().__init__()
         self.ui = parentform_ui
         self._api = api
         self._exiting = True
-        self._dispatcher = Dispatcher()
-        self._exiting_signal.connect(self._dispatcher.terminate)
-        self._dispatcher.start()
+        self._dispatcher = dispatcher
 
         self._user_list = UserList(self.ui, self._api, self._dispatcher)
         self._exiting_signal.connect(self._user_list.exiting)

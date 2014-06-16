@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'audiolistitemwidget.ui'
 #
-# Created: Sat Jun 14 20:21:53 2014
+# Created: Mon Jun 16 23:48:58 2014
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(393, 55)
+        Form.resize(393, 27)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -25,9 +25,16 @@ class Ui_Form(object):
         self.verticalLayout.setContentsMargins(9, 0, 9, 0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
-        self.horizontalLayout_2.setSpacing(0)
+        self.horizontalLayout_2.setSpacing(5)
         self.horizontalLayout_2.setContentsMargins(-1, 0, -1, -1)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.playpauseLabel = QtGui.QLabel(Form)
+        self.playpauseLabel.setMaximumSize(QtCore.QSize(16, 16))
+        self.playpauseLabel.setText("")
+        self.playpauseLabel.setPixmap(QtGui.QPixmap(":/newFlatIcons/Icons/Button-Play-icon.png"))
+        self.playpauseLabel.setScaledContents(True)
+        self.playpauseLabel.setObjectName("playpauseLabel")
+        self.horizontalLayout_2.addWidget(self.playpauseLabel)
         self.artistLabel = QtGui.QLabel(Form)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -54,6 +61,9 @@ class Ui_Form(object):
         self.titleLabel.setWordWrap(False)
         self.titleLabel.setObjectName("titleLabel")
         self.horizontalLayout_2.addWidget(self.titleLabel)
+        self.durationLabel = QtGui.QLabel(Form)
+        self.durationLabel.setObjectName("durationLabel")
+        self.horizontalLayout_2.addWidget(self.durationLabel)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
         self.stateLabel = QtGui.QLabel(Form)
@@ -61,39 +71,6 @@ class Ui_Form(object):
         self.stateLabel.setObjectName("stateLabel")
         self.horizontalLayout_2.addWidget(self.stateLabel)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
-        self.verticalLayout_2 = QtGui.QVBoxLayout()
-        self.verticalLayout_2.setSpacing(0)
-        self.verticalLayout_2.setContentsMargins(-1, 3, -1, -1)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.horizontalLayout = QtGui.QHBoxLayout()
-        self.horizontalLayout.setContentsMargins(-1, 0, -1, -1)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.verticalLayout_2.addLayout(self.horizontalLayout)
-        self.horizontalLayout_3 = QtGui.QHBoxLayout()
-        self.horizontalLayout_3.setSpacing(13)
-        self.horizontalLayout_3.setContentsMargins(-1, 0, -1, -1)
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.playpauseLabel = QtGui.QLabel(Form)
-        self.playpauseLabel.setMaximumSize(QtCore.QSize(25, 25))
-        self.playpauseLabel.setText("")
-        self.playpauseLabel.setPixmap(QtGui.QPixmap(":/newicons/Icons/Sekkyumu-Developpers-Play-Blue-Button.ico"))
-        self.playpauseLabel.setScaledContents(True)
-        self.playpauseLabel.setObjectName("playpauseLabel")
-        self.horizontalLayout_3.addWidget(self.playpauseLabel)
-        self.durationLabel = QtGui.QLabel(Form)
-        self.durationLabel.setObjectName("durationLabel")
-        self.horizontalLayout_3.addWidget(self.durationLabel)
-        self.seekSlider = phonon.Phonon.SeekSlider(Form)
-        self.seekSlider.setIconVisible(False)
-        self.seekSlider.setTracking(False)
-        self.seekSlider.setObjectName("seekSlider")
-        self.horizontalLayout_3.addWidget(self.seekSlider)
-        self.playLabel = QtGui.QLabel(Form)
-        self.playLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.playLabel.setObjectName("playLabel")
-        self.horizontalLayout_3.addWidget(self.playLabel)
-        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
-        self.verticalLayout.addLayout(self.verticalLayout_2)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -104,7 +81,5 @@ class Ui_Form(object):
         self.label_3.setText(QtGui.QApplication.translate("Form", " - ", None, QtGui.QApplication.UnicodeUTF8))
         self.titleLabel.setText(QtGui.QApplication.translate("Form", "Title", None, QtGui.QApplication.UnicodeUTF8))
         self.durationLabel.setText(QtGui.QApplication.translate("Form", "4:20", None, QtGui.QApplication.UnicodeUTF8))
-        self.playLabel.setText(QtGui.QApplication.translate("Form", "0:35", None, QtGui.QApplication.UnicodeUTF8))
 
-from PySide import phonon
-import resourses_rc
+import resourses.resourses_rc

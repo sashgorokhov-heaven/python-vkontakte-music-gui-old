@@ -1,5 +1,6 @@
 import random
 from PySide import QtCore
+from modules.forms.mainform.components.audiolist.components.audiolistitemwidget import AudioListItemWidget
 
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
@@ -14,34 +15,52 @@ def getValidFilename(filename):
     return ''.join(i for i in filename if re.match(regexp, i))[:100]
 
 class VkAudio:
-    def __init__(self, audioobject):
-        self.__object = audioobject
-        self.owner_id = None
+    def __init__(self, vkobject, widget: AudioListItemWidget=None):
+        self.__vkobject = vkobject
+        self._current_widget = widget
+        self._state = 'idle'
+
+    def get_state(self):
+        return self._state
+
+    @QtCore.Slot(str, int)
+    @QtCore.Slot(str, Exception)
+    def set_state(self, state:str, params=None):
+        self._state = state
+        if self._current_widget:
+            func = self._current_widget.__getattribute__('state_'+self._state)
+            func(params) if params else func()
+
+    def current_widget(self) -> AudioListItemWidget:
+        return self._current_widget
+
+    def set_current_widget(self, widget: AudioListItemWidget):
+        self._current_widget = widget
 
     def id(self):
-        return self.__object['id']
+        return self.__vkobject['id']
 
-    def getObject(self):
-        return self.__object
+    def get_vkobject(self):
+        return self.__vkobject
 
     def artist(self):
-        return self.__object['artist']
+        return self.__vkobject['artist']
 
     def title(self):
-        return self.__object['title']
+        return self.__vkobject['title']
 
     def url(self):
-        return self.__object['url']
+        return self.__vkobject['url']
 
     def duration(self, parsed=False):
         if parsed:
-            mins = (self.__object['duration'] // 60)
-            secs = self.__object['duration']-60*(self.__object['duration'] // 60)
+            mins = str('0'*(2-len(str(self.__vkobject['duration'] // 60)))+str(self.__vkobject['duration'] // 60))
+            secs = str(self.__vkobject['duration']-60*(self.__vkobject['duration'] // 60))
             return (mins, secs)
-        return self.__object['duration']
+        return self.__vkobject['duration']
 
     def __getattr__(self, item):
-        return self.__object[item]
+        return self.__vkobject[item]
 
     def __str__(self):
         return '[{0}] {} - {}'.format(':'.join(self.duration(True)), self.artist(), self.title())
