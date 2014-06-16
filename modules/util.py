@@ -46,28 +46,6 @@ class VkAudio:
     def __str__(self):
         return '[{0}] {} - {}'.format(':'.join(self.duration(True)), self.artist(), self.title())
 
-#колеса
-class Buffer:
-    def __init__(self):
-        self.__lock = threading.Lock()
-        self.__buffer = dict()
-
-    def get(self, key):
-        with self.__lock:
-            return self.__buffer[key]
-
-    def put(self, key, value):
-        with self.__lock:
-            self.__buffer[key] = value
-
-    def remove(self, key):
-        with self.__lock:
-            return self.__buffer.pop(key)
-
-    def __contains__(self, item):
-        with self.__lock:
-            return item in self.__buffer
-
 
 class ThreadedWorker(QtCore.QThread):
     def __init__(self, **kwargs):
@@ -87,20 +65,17 @@ class ThreadedWorker(QtCore.QThread):
         with self._lock:
             return self._result
 
-if __name__ == '__main__':
-    print(getValidFilename("D. Guetta ft. Lil Wayne - my bombs (jetty's remix)"))
-
 
 class Dispatcher(QtCore.QThread):
     _take_signal = QtCore.Signal()
 
-    def __init__(self):
+    def __init__(self, worksleep=0):
         super().__init__()
         self._queque = list()
         self._lock = threading.Lock()
         self._continue_lock = threading.Lock()
         self._IDs = set()
-        self._worksleep = 150
+        self._worksleep = worksleep
         self._results = dict() # ID -> result
         self._take_signal.connect(self._take)
         self._condition = threading.Condition()
@@ -131,7 +106,7 @@ class Dispatcher(QtCore.QThread):
             self._wait_condition.wait()
             self._wait_condition.release()
             while len(self._queque)>0:
-                #self.msleep(self._worksleep)
+                self.msleep(self._worksleep)
                 self._take_signal.emit()
                 self._condition.acquire()
                 self._condition.wait()

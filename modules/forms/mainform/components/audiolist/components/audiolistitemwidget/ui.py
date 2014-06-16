@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'audiowidget.ui'
+# Form implementation generated from reading ui file 'audiolistitemwidget.ui'
 #
 # Created: Sat Jun 14 20:21:53 2014
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2

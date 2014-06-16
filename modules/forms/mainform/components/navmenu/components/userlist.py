@@ -39,7 +39,8 @@ class UserList(QtCore.QObject):
         self.ui.userList.itemDoubleClicked.connect(self._userlist_itemclicked)
 
         self._add_user()
-        #self.add_recomendations()
+        # TODO: self.add_recomendations()
+        # TODO: self.add_playlists()
 
     @QtCore.Slot(_UserListItem)
     def _userlist_itemclicked(self, item):
@@ -68,4 +69,7 @@ class UserList(QtCore.QObject):
         self._userlist_itemclicked(item)
 
     def add_recomendations(self):
+        raise NotImplementedError
+
+    def add_playlists(self):
         raise NotImplementedError
