@@ -1,130 +1,104 @@
+from modules.util import Dispatcher
+from modules.vk.api import VKError
+
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
 from PySide import QtCore, QtGui
-import threading
 from modules import util
-from modules.forms.ui.audiowidget import Ui_Form
+from modules.forms.mainform.components.audiolist.components.audiolistitemwidget import AudioListItemWidget
+import threading
 
-STATES = {0:'Ожидает загрузки', 1:'Загружается', 2:'Загружено', 3:'Ошибка', 4:'Отмена'}
+class _AudioListWorker(util.ThreadedWorker):
+    def _workfunc(self):
+        self._kwargs['set_countlabel'].emit('0')
+        try:
+            audiolist_vkobject = self._kwargs['api'].call('audio.get', owner_id=self._kwargs['uid'])['items']
+        except VKError as e:
+            if e.error_code==15:
+                self._kwargs['addaudio_error_signal'].emit('Аудиозаписи в группе отключены.')
+            if e.error_code==201:
+                self._kwargs['addaudio_error_signal'].emit('Пользователь скрыл свои драгоценные аудиозаписи.')
+            return
+        self._kwargs['set_countlabel'].emit(str(len(audiolist_vkobject)))
+        if len(audiolist_vkobject) == 0:
+            self._kwargs['addaudio_error_signal'].emit('Аудиозаписей нет.')
+        for audio_vkobject in audiolist_vkobject:
+            self._kwargs['addaudio_signal'].emit(audio_vkobject)
 
-
-class AudioListWidgetItem(QtGui.QWidget, Ui_Form):
-    def __init__(self, vkobject, parent, parentitem):
+class AudioList(QtCore.QObject):
+    _exiting_signal = QtCore.Signal()
+    _addaudio_error_signal = QtCore.Signal(str)
+    _set_countlabel_signal = QtCore.Signal(str)
+    _addaudio_signal = QtCore.Signal(dict)
+    _kill_workerthread = QtCore.Signal()
+    def __init__(self, parentform_ui, api):
         super().__init__()
-        self.setupUi(self)
-        self.vkaudio = util.VkAudio(vkobject)
-        self.parent = parent
-        self.item = parentitem
-        self.choosed = False
+        self.ui = parentform_ui
+        self._api = api
+        self._exiting = False
+        self._dispatcher = Dispatcher()
+        self._dispatcher.start()
+        self._worklock = threading.Lock()
+        self._current_uid = None
 
-        self.item.setSizeHint(self.sizeHint())
-        self.titleLabel.setText(str(self.vkaudio.title()))
-        self.artistLabel.setText(str(self.vkaudio.artist()))
-        self.durationLabel.setText('{}:{}'.format(*self.vkaudio.duration(True)))
-        self.playLabel.setText('0:00')
+        self._vkaudio_pool = dict() # aid -> VKAudio
 
-        self.owner_id = self.parent.current_id
-        self.vkaudio.owner_id = self.owner_id
-
-        if self.vkaudio.id() in self.parent.choosed[self.owner_id]:
-            self.parent.choosed[self.owner_id][self.vkaudio.id()] = \
-                (self.parent.choosed[self.owner_id][self.vkaudio.id()][0], self)
-            self.updateState(self.parent.choosed[self.owner_id][self.vkaudio.id()][0])
-
-    def __setChoose(self, state):
-        self.choosed = state
-        self.setEnabled(not state)
-
-    def choose(self):
-        self.__setChoose(True)
-
-    def unchoose(self):
-        self.__setChoose(False)
-
-    def doubleClicked(self):
-        self.choose()
-        self.parent.choosed[self.parent.current_id][self.vkaudio.id()] = (0, self)
-        self.parent.itemChoosed.emit(self.vkaudio)
-
-    def mouseDoubleClickEvent(self, event):
-        self.doubleClicked()
-
-    def updateState(self, state_n):
-        if state_n>=2:
-            self.unchoose()
-        self.stateLabel.setText(STATES[state_n])
-
-class AudioListWidget(QtCore.QObject):
-    itemChoosed = QtCore.Signal(util.VkAudio)
-
-    def __init__(self, parent):
-        super().__init__()
-        self.parent = parent
-        self.__stop = False
-        self.worklock = threading.Lock()
-        self.choosed = dict() # user_id -> audio_id -> (state, widget)
-        self.current_id = None
+        self._addaudio_error_signal.connect(self._addaudio_error_slot)
+        self._set_countlabel_signal.connect(self._set_countlabel_slot)
+        self._addaudio_signal.connect(self._addaudio_slot)
 
     @QtCore.Slot()
     def exiting(self):
-        self.__stop = True
+        self._exiting = True
+        self._exiting_signal.emit()
 
-    @QtCore.Slot(util.VkAudio, int)
-    def updateState(self, vkaudio, state_n):
-        state, widget = self.choosed[vkaudio.owner_id][vkaudio.id()]
-        if widget:
-            widget.updateState(state_n)
-        self.choosed[vkaudio.owner_id][vkaudio.id()] = (state_n, widget)
+    def get_current_uid(self):
+        return self._current_uid
+
+    @QtCore.Slot(int)
+    def load_audio(self, uid:int):
+        self._kill_workerthread.emit()
+        self._dispatcher.clear_queque()
+        with self._worklock:
+            self.current_uid = uid
+            self.ui.audioList.clear()
+            self._worker_thread = _AudioListWorker(api=self._api, uid=uid,
+                                                   addaudio_error_signal=self._addaudio_error_signal,
+                                                   set_countlabel=self._set_countlabel_signal,
+                                                   addaudio_signal=self._addaudio_signal)
+            self._worker_thread.finished.connect(self._work_complete)
+            self._kill_workerthread.connect(self._worker_thread.terminate)
+            self._exiting_signal.connect(self._worker_thread.terminate)
+            self._worker_thread.start()
 
     @QtCore.Slot()
-    def load_audio(self, owner_id):
-        self.__stop = True
-        with self.worklock:
-            self.__stop = False
-            if owner_id not in self.choosed:
-                self.choosed[owner_id] = dict()
-            if self.current_id:
-                for key in self.choosed[self.current_id]:
-                    self.choosed[self.current_id][key] = \
-                        (self.choosed[self.current_id][key][0], None)
-            self.current_id = owner_id
-            self.parent.audioList.clear()
-            self.parent.countLabel.setText('0')
-            self.__list_filler = util.LoadThread(self.__fill_list)
-            self.__list_filler.signalEmitter.connect(self.__addAudioItemSlot)
-            self.__list_filler.start()
+    def _work_complete(self):
+        pass
 
-    def __fill_list(self, emitter):
-        with self.worklock:
-            try:
-                audios = self.parent.api.call('audio.get', owner_id=self.current_id)['items']
-            except Exception as e:
-                if e.error['error_code']==15:
-                    self.parent.audioList.addItem(
-                        QtGui.QListWidgetItem('Аудиозаписи в группе отключены.'))
-                if e.error['error_code']==201:
-                    self.parent.audioList.addItem(
-                        QtGui.QListWidgetItem('Пользователь скрыл свои драгоценные аудиозаписи.'))
-                return
-            self.parent.countLabel.setText(str(len(audios)))
-            if len(audios)==0:
-                self.parent.audioList.addItem(
-                    QtGui.QListWidgetItem('Аудиозаписей нет.'))
-            for vkobject in audios:
-                if self.__stop:
-                    return
-                emitter.emit(vkobject, 0, 0)
-                QtCore.QThread.msleep(100)
+    @QtCore.Slot(str)
+    def _addaudio_error_slot(self, msg):
+        self.ui.audioList.addItem(QtGui.QListWidgetItem(str(msg)))
 
-    @QtCore.Slot(dict, int, int)
-    def __addAudioItemSlot(self, vkobject, n, p):
-        if self.__stop:
-            return
+    @QtCore.Slot(str)
+    def _set_countlabel_slot(self, msg):
+        self.ui.countLabel.setText(msg)
+
+    @QtCore.Slot(dict)
+    def _addaudio_slot(self, audio_vkobject):
+        if audio_vkobject['id'] not in self._vkaudio_pool:
+            self._vkaudio_pool[audio_vkobject['id']] = util.VkAudio(audio_vkobject)
+        vkaudio = self._vkaudio_pool[audio_vkobject['id']]
+        self._dispatcher.addTask(AudioList._addaudio_guiwork, (self, vkaudio))
+
+    @staticmethod
+    def _addaudio_guiwork(self, vkaudio):
         try:
+            if vkaudio.get_owner()!=self._current_uid:
+                return
             item = QtGui.QListWidgetItem()
-            widget = AudioListWidgetItem(vkobject, self, item)
-            self.parent.audioList.addItem(item)
-            self.parent.audioList.setItemWidget(item, widget)
+            widget = AudioListItemWidget(vkaudio)
+            self.ui.audioList.addItem(item)
+            self.ui.audioList.setItemWidget(item, widget)
         except Exception as e:
-            self.parent.audioList.addItem(QtGui.QListWidgetItem('Ошибка создания объекта аудиозаписи: {}'.format(e)))
+            self.ui.audioList.addItem(QtGui.QListWidgetItem('Ошибка создания объекта аудиозаписи: {}'.format(e)))

@@ -1,6 +1,5 @@
 import random
 from PySide import QtCore
-from modules.forms.mainform.components.audiolist.components.audiolistitemwidget import AudioListItemWidget
 
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
@@ -15,10 +14,14 @@ def getValidFilename(filename):
     return ''.join(i for i in filename if re.match(regexp, i))[:100]
 
 class VkAudio:
-    def __init__(self, vkobject, widget: AudioListItemWidget=None):
+    def __init__(self, vkobject, widget=None, owner=None):
         self.__vkobject = vkobject
         self._current_widget = widget
         self._state = 'idle'
+        self._owner = owner
+
+    def get_owner(self):
+        return self._owner
 
     def get_state(self):
         return self._state
@@ -31,10 +34,10 @@ class VkAudio:
             func = self._current_widget.__getattribute__('state_'+self._state)
             func(params) if params else func()
 
-    def current_widget(self) -> AudioListItemWidget:
+    def current_widget(self):
         return self._current_widget
 
-    def set_current_widget(self, widget: AudioListItemWidget):
+    def set_current_widget(self, widget):
         self._current_widget = widget
 
     def id(self):
@@ -100,6 +103,12 @@ class Dispatcher(QtCore.QThread):
         self._condition = threading.Condition()
         self._wait_condition = threading.Condition()
 
+    def clear_queque(self):
+        with self._lock:
+            self._queque.clear()
+            self._results.clear()
+            self._IDs.clear()
+
     def addTask(self, run_func, data=None, ID:int=None):
         with self._lock:
             self._queque.append((run_func, data, ID))
@@ -110,14 +119,19 @@ class Dispatcher(QtCore.QThread):
     @QtCore.Slot()
     def _take(self):
         with self._lock:
-            run_func, data, ID = self._queque.pop(0)
-            if ID is not None:
-                self._results[ID] = run_func(*data) if data is not None else run_func()
-            else:
-                _ = run_func(*data) if data is not None else run_func()
-            self._condition.acquire()
-            self._condition.notify()
-            self._condition.release()
+            try:
+                if len(self._queque)!=0:
+                    run_func, data, ID = self._queque.pop(0)
+                    if ID is not None:
+                        self._results[ID] = run_func(*data) if data is not None else run_func()
+                    else:
+                        _ = run_func(*data) if data is not None else run_func()
+            except Exception as e:
+                print(e)
+            finally:
+                self._condition.acquire()
+                self._condition.notify()
+                self._condition.release()
 
     def run(self):
         while True:

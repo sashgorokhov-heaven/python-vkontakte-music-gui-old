@@ -9,8 +9,8 @@ except ImportError as e:
     logger.write('Import error: {}'.format(str(e)))
     exit(-1)
 
-from modules import constants, util, vk
-from modules.vk import api
+from modules import constants, vk
+from modules.vk import api, accesstokener
 
 access_token, user_id, expires = vk.quickauth_qt(constants.application_id, constants.permissions_scope)
 

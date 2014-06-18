@@ -2,7 +2,6 @@ __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
 from PySide import QtCore, QtGui
-import threading
 from modules import cacher, util
 import os.path
 

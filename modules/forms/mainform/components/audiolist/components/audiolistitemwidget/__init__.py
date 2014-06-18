@@ -5,11 +5,9 @@ from PySide import QtCore, QtGui
 from .ui import Ui_Form
 from modules.util import VkAudio
 
-playicon = QtGui.QPixmap(QtGui.QIcon(":/newFlatIcons/Icons/Button-Play-icon.png"))
-pauseicon = QtGui.QPixmap(QtGui.QIcon(":/newFlatIcons/Icons/Button-Pause-icon.png"))
-
 class AudioListItemWidget(QtGui.QWidget, Ui_Form):
     play_signal = QtCore.Signal(VkAudio)
+    double_clicked = QtCore.Signal(VkAudio)
     pause_signal = QtCore.Signal(VkAudio)
     def __init__(self, vkaudio: VkAudio):
         super().__init__()
@@ -18,10 +16,13 @@ class AudioListItemWidget(QtGui.QWidget, Ui_Form):
         self._vkaudio.set_current_widget(self)
         self.artistLabel.setText(vkaudio.artist())
         self.titleLabel.setText(vkaudio.title())
+        self.durationLabel.setText(':'.join(vkaudio.duration(True)))
         self.__getattribute__('state_'+self._vkaudio.get_state())()
+        self.playicon = QtGui.QPixmap(":/newFlatIcons/Icons/Button-Play-icon.png")
+        self.pauseicon = QtGui.QPixmap(":/newFlatIcons/Icons/Button-Pause-icon.png")
 
     def _set_iconlabel(self, playing:bool):
-        self.playpauseLabel.setPixmap(playicon if playing else pauseicon)
+        self.playpauseLabel.setPixmap(self.playicon if playing else self.pauseicon)
 
     def play(self):
         self._set_iconlabel(False)
@@ -53,3 +54,6 @@ class AudioListItemWidget(QtGui.QWidget, Ui_Form):
 
     def __del__(self):
         self._vkaudio.set_current_widget(None)
+
+    def mouseDoubleClickEvent(self, event=None):
+        self.double_clicked.emit(self._vkaudio)

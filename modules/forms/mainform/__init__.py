@@ -1,3 +1,5 @@
+from modules.forms.mainform.components.audiolist import AudioList
+
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 
@@ -19,13 +21,14 @@ class MainForm(QtGui.QWidget, Ui_Form):
 
         self._dispatcher = Dispatcher()
         self.exiting.connect(self._dispatcher.terminate)
+        self._dispatcher.start()
 
         self.navigation_menu = NavigationMenu(self, self.api, self._dispatcher)
         self.exiting.connect(self.navigation_menu.exiting)
 
-        #self.audio_list = audio_list.AudioListWidget(self)
-        #self.exiting.connect(self.audio_list.exiting)
-        #self.navigation_menu.menuItemClicked.connect(self.audio_list.load_audio)
+        self.audio_list = AudioList(self, self.api)
+        self.exiting.connect(self.audio_list.exiting)
+        self.navigation_menu.menu_itemclicked.connect(self.audio_list.load_audio)
 
         #self.download_manager = downloadform.AudioDownloadWidget(self)
         #self.exiting.connect(self.download_manager.exiting)
