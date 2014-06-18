@@ -1,4 +1,4 @@
-from modules.util import Dispatcher
+from modules.util import Dispatcher, VkAudio
 from modules.vk.api import VKError
 
 __author__ = 'sashgorokhov'
@@ -32,13 +32,24 @@ class AudioList(QtCore.QObject):
     _set_countlabel_signal = QtCore.Signal(str)
     _addaudio_signal = QtCore.Signal(dict)
     _kill_workerthread = QtCore.Signal()
+    item_choosed = QtCore.Signal(VkAudio)
     def __init__(self, parentform_ui, api):
         super().__init__()
         self.ui = parentform_ui
         self._api = api
+        self.ui.downloadSelectedButton.setVisible(False)
+        self.ui.audioList.itemSelectionChanged.connect( # :)
+            QtCore.Slot()( # :)
+                lambda : # :)
+                (self.ui.downloadSelectedButton.setVisible(len(self.ui.audioList.selectedItems())!=0), # :)
+                 self.ui.downloadSelectedButton.setText('Загрузить выбранное ({})'.format(len(self.ui.audioList.selectedItems())))) # :)
+            ) # :)
+        ) # :)
+        self.ui.downloadSelectedButton.clicked.connect(self.downloadSelectedButton_clicked)
         self._exiting = False
         self._dispatcher = Dispatcher()
         self._dispatcher.start()
+        self._exiting_signal.connect(self._dispatcher.terminate)
         self._worklock = threading.Lock()
         self._current_uid = None
 
@@ -47,6 +58,12 @@ class AudioList(QtCore.QObject):
         self._addaudio_error_signal.connect(self._addaudio_error_slot)
         self._set_countlabel_signal.connect(self._set_countlabel_slot)
         self._addaudio_signal.connect(self._addaudio_slot)
+
+    @QtCore.Slot()
+    def downloadSelectedButton_clicked(self):
+        for item in self.ui.audioList.selectedItems():
+            widget = self.ui.audioList.itemWidget(item)
+            widget.double_clicked()
 
     @QtCore.Slot()
     def exiting(self):
@@ -100,5 +117,10 @@ class AudioList(QtCore.QObject):
             widget = AudioListItemWidget(vkaudio)
             self.ui.audioList.addItem(item)
             self.ui.audioList.setItemWidget(item, widget)
+            widget.double_clicked_signal.connect(self._item_choosed)
         except Exception as e:
             self.ui.audioList.addItem(QtGui.QListWidgetItem('Ошибка создания объекта аудиозаписи: {}'.format(e)))
+
+    @QtCore.Slot(VkAudio)
+    def _item_choosed(self, vkaudio):
+        self.item_choosed.emit(vkaudio)

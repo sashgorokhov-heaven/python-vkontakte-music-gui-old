@@ -649,6 +649,21 @@ border-bottom-left-radius: 7px;
          </disabled>
         </palette>
        </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
+       </property>
+       <property name="showDropIndicator" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectItems</enum>
+       </property>
+       <property name="spacing">
+        <number>1</number>
+       </property>
       </widget>
      </item>
      <item>
@@ -678,6 +693,26 @@ border-bottom-left-radius: 7px;
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="downloadSelectedButton">
+         <property name="text">
+          <string>Загрузить выбранное</string>
+         </property>
+         <property name="icon">
+          <iconset resource="resourses.qrc">
+           <normaloff>:/icons/Icons/windowicon.ico</normaloff>:/icons/Icons/windowicon.ico</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

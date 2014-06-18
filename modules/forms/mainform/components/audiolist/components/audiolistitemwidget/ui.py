@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'audiolistitemwidget.ui'
 #
-# Created: Mon Jun 16 23:48:58 2014
+# Created: Thu Jun 19 00:03:49 2014
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!

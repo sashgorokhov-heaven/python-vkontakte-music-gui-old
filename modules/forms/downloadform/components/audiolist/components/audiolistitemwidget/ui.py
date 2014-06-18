@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'audiodownloadwidget.ui'
 #
-# Created: Mon Jun 16 23:48:59 2014
+# Created: Thu Jun 19 00:03:50 2014
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -61,4 +61,4 @@ class Ui_Form(object):
         self.label_4.setText(QtGui.QApplication.translate("Form", " - ", None, QtGui.QApplication.UnicodeUTF8))
         self.titleLabel.setText(QtGui.QApplication.translate("Form", "Title", None, QtGui.QApplication.UnicodeUTF8))
 
-import resourses_rc
+import resourses.resourses_rc

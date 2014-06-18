@@ -1,3 +1,4 @@
+from modules.forms.downloadform import DownloadManager
 from modules.forms.mainform.components.audiolist import AudioList
 
 __author__ = 'sashgorokhov'
@@ -30,12 +31,10 @@ class MainForm(QtGui.QWidget, Ui_Form):
         self.exiting.connect(self.audio_list.exiting)
         self.navigation_menu.menu_itemclicked.connect(self.audio_list.load_audio)
 
-        #self.download_manager = downloadform.AudioDownloadWidget(self)
-        #self.exiting.connect(self.download_manager.exiting)
-        #self.audio_list.itemChoosed.connect(self.download_manager.add)
-        #self.download_manager.updateState.connect(self.audio_list.updateState)
-
-        #self.downloadButton.clicked.connect(self.download_manager.show)
+        self.download_manager = DownloadManager(self)
+        self.exiting.connect(self.download_manager.exiting)
+        self.audio_list.item_choosed.connect(self.download_manager.add_audio)
+        self.downloadButton.clicked.connect(self.download_manager.show)
 
     def closeEvent(self, event):
         self.exiting.emit()

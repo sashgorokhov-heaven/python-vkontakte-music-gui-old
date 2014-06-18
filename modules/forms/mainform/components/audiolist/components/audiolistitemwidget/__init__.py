@@ -7,7 +7,7 @@ from modules.util import VkAudio
 
 class AudioListItemWidget(QtGui.QWidget, Ui_Form):
     play_signal = QtCore.Signal(VkAudio)
-    double_clicked = QtCore.Signal(VkAudio)
+    double_clicked_signal = QtCore.Signal(VkAudio)
     pause_signal = QtCore.Signal(VkAudio)
     def __init__(self, vkaudio: VkAudio):
         super().__init__()
@@ -35,25 +35,34 @@ class AudioListItemWidget(QtGui.QWidget, Ui_Form):
     def state_idle(self):
         self.stateLabel.setText('')
         self._state = 'idle'
+        self.setEnabled(True)
 
     def state_waiting(self):
         self.stateLabel.setText('Ожидание')
         self._state = 'waiting'
+        self.setEnabled(False)
 
     def state_loading(self, p:int=None):
         self.stateLabel.setText('Загрузка {}%'.format(p) if p else 'Загрузка')
         self._state = 'loading'
+        self.setEnabled(False)
 
     def state_complete(self):
         self.stateLabel.setText('Загружено')
         self._state = 'complete'
+        self.setEnabled(True)
 
     def state_error(self, e:Exception=None):
         self.stateLabel.setText('Ошибка {}'.format(e) if e else 'Ошибка')
         self._state = 'error'
+        self.setEnabled(True)
 
     def __del__(self):
         self._vkaudio.set_current_widget(None)
 
+    def double_clicked(self):
+        if self._state=='waiting' or self._state=='loading': return
+        self.double_clicked_signal.emit(self._vkaudio)
+
     def mouseDoubleClickEvent(self, event=None):
-        self.double_clicked.emit(self._vkaudio)
+        self.double_clicked()

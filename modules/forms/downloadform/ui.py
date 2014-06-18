@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'loadform.ui'
 #
-# Created: Mon Jun 16 23:48:57 2014
+# Created: Thu Jun 19 00:03:48 2014
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -109,6 +109,10 @@ class Ui_Form(object):
         self.horizontalLayout.addItem(spacerItem4)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.downloadListWidget = QtGui.QListWidget(Form)
+        self.downloadListWidget.setEditTriggers(QtGui.QAbstractItemView.DoubleClicked)
+        self.downloadListWidget.setProperty("showDropIndicator", False)
+        self.downloadListWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.downloadListWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectItems)
         self.downloadListWidget.setObjectName("downloadListWidget")
         self.verticalLayout.addWidget(self.downloadListWidget)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
@@ -135,4 +139,4 @@ class Ui_Form(object):
         self.startButton.setText(QtGui.QApplication.translate("Form", "Начать загрузку", None, QtGui.QApplication.UnicodeUTF8))
         self.pauseButton.setText(QtGui.QApplication.translate("Form", "Пауза", None, QtGui.QApplication.UnicodeUTF8))
 
-import resourses_rc
+import resourses.resourses_rc

@@ -258,7 +258,20 @@ background: rgb(170, 170, 255)
     </layout>
    </item>
    <item>
-    <widget class="QListWidget" name="downloadListWidget"/>
+    <widget class="QListWidget" name="downloadListWidget">
+     <property name="editTriggers">
+      <set>QAbstractItemView::DoubleClicked</set>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectItems</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">

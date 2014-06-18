@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainform.ui'
 #
-# Created: Mon Jun 16 23:48:57 2014
+# Created: Thu Jun 19 00:03:49 2014
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -273,6 +273,11 @@ class Ui_Form(object):
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
         self.audioList.setPalette(palette)
+        self.audioList.setEditTriggers(QtGui.QAbstractItemView.AnyKeyPressed|QtGui.QAbstractItemView.DoubleClicked)
+        self.audioList.setProperty("showDropIndicator", False)
+        self.audioList.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        self.audioList.setSelectionBehavior(QtGui.QAbstractItemView.SelectItems)
+        self.audioList.setSpacing(1)
         self.audioList.setObjectName("audioList")
         self.verticalLayout_4.addWidget(self.audioList)
         self.horizontalLayout_7 = QtGui.QHBoxLayout()
@@ -284,6 +289,14 @@ class Ui_Form(object):
         self.horizontalLayout_7.addWidget(self.downloadButton)
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_7.addItem(spacerItem1)
+        self.downloadSelectedButton = QtGui.QPushButton(Form)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/icons/Icons/windowicon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.downloadSelectedButton.setIcon(icon4)
+        self.downloadSelectedButton.setIconSize(QtCore.QSize(15, 15))
+        self.downloadSelectedButton.setFlat(False)
+        self.downloadSelectedButton.setObjectName("downloadSelectedButton")
+        self.horizontalLayout_7.addWidget(self.downloadSelectedButton)
         self.verticalLayout_4.addLayout(self.horizontalLayout_7)
         self.horizontalLayout_5.addLayout(self.verticalLayout_4)
         self.verticalLayout_5 = QtGui.QVBoxLayout()
@@ -323,6 +336,7 @@ class Ui_Form(object):
         self.label_7.setText(QtGui.QApplication.translate("Form", "Аудиозаписей: ", None, QtGui.QApplication.UnicodeUTF8))
         self.countLabel.setText(QtGui.QApplication.translate("Form", "0", None, QtGui.QApplication.UnicodeUTF8))
         self.downloadButton.setText(QtGui.QApplication.translate("Form", "Ожидают загрузки: 0 ", None, QtGui.QApplication.UnicodeUTF8))
+        self.downloadSelectedButton.setText(QtGui.QApplication.translate("Form", "Загрузить выбранное", None, QtGui.QApplication.UnicodeUTF8))
 
 from PySide import phonon
 import resourses.resourses_rc
