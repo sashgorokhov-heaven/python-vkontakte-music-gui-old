@@ -156,3 +156,42 @@ class Dispatcher(QtCore.QThread):
     def get_result(self, ID:int):
         self._IDs.pop(ID)
         return self._results.pop(ID)
+
+
+class SpeedController(QtCore.QObject):
+    _exiting_signal = QtCore.Signal()
+    _tick_signal = QtCore.Signal()
+
+    class _SpeedControllerThreaded(ThreadedWorker):
+        def _workfunc(self):
+            while True:
+                self.sleep(1)
+                self._kwargs['tick'].emit()
+
+    def __init__(self):
+        super().__init__()
+        self._tick_signal.connect(self._tick_slot)
+        self._thread = self._SpeedControllerThreaded(tick=self._tick_signal)
+        self._exiting_signal.connect(self._thread.terminate)
+        self._total_amount = 0
+        self._speed = 0
+        self._lock = threading.Lock()
+        self._thread.start()
+
+    @QtCore.Slot()
+    def _tick_slot(self):
+        print('aaaa')
+        with self._lock:
+            self._speed = self._total_amount
+            self._total_amount = 0
+
+    @QtCore.Slot()
+    def exiting(self):
+        self._exiting_signal.emit()
+
+    def feed(self, amount:int):
+        with self._lock:
+            self._total_amount += amount
+
+    def get_speed(self) -> int:
+        return self._speed
