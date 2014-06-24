@@ -26,7 +26,8 @@ except Exception as e:
 from modules.forms import mainform
 from PySide import QtGui
 
-app = QtGui.QApplication([])
+# :( исправить эту некрасоту
+app = QtGui.QApplication.instance() if QtGui.QApplication.instance() else QtGui.QApplication([])
 mform = mainform.MainForm(api.VKApi(access_token))
 mform.show()
 app.exec_()

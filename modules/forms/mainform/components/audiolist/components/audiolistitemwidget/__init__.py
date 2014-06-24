@@ -52,7 +52,7 @@ class AudioListItemWidget(QtGui.QWidget, Ui_Form):
         self._state = 'complete'
         self.setEnabled(True)
 
-    def state_error(self, e:Exception=None):
+    def state_error(self, e=None):
         self.stateLabel.setText('Ошибка {}'.format(e) if e else 'Ошибка')
         self._state = 'error'
         self.setEnabled(True)

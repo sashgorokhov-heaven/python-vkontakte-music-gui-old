@@ -1,7 +1,7 @@
 __author__ = "Alexander Gorokhov"
 __email__ = "sashgorokhov@gmail.com"
 
-from PyQt4 import QtCore, QtWebKit, QtGui
+from PySide import QtCore, QtWebKit, QtGui
 from urllib.parse import urlparse
 
 
@@ -40,5 +40,6 @@ def show_browser(appId, scope):
     app = QtGui.QApplication([])
     form = __QtAuthWindow(str(appId), scope)
     form.show()
-    app.exec_()
+    app.exit(app.exec_())
+    app.quit()
     return form.accessToken, form.userId, form.expires

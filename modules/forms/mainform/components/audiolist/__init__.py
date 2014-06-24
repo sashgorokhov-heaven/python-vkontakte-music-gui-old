@@ -63,7 +63,8 @@ class AudioList(QtCore.QObject):
     def downloadSelectedButton_clicked(self):
         for item in self.ui.audioList.selectedItems():
             widget = self.ui.audioList.itemWidget(item)
-            widget.double_clicked()
+            if widget:
+                widget.double_clicked()
 
     @QtCore.Slot()
     def exiting(self):
@@ -79,6 +80,11 @@ class AudioList(QtCore.QObject):
         self._dispatcher.clear_queque()
         with self._worklock:
             self.current_uid = uid
+            for i in range(self.ui.audioList.count()):
+                item = self.ui.audioList.item(i)
+                widget = self.ui.audioList.itemWidget(item)
+                if widget:
+                    widget._vkaudio.set_current_widget(None)
             self.ui.audioList.clear()
             self._worker_thread = _AudioListWorker(api=self._api, uid=uid,
                                                    addaudio_error_signal=self._addaudio_error_signal,
