@@ -1,3 +1,4 @@
+# coding=utf-8
 __author__ = 'sashgorokhov'
 __email__ = 'sashgorokhov@gmail.com'
 

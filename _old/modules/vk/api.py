@@ -1,6 +1,5 @@
 __author__ = "Alexander Gorokhov"
 __email__ = "sashgorokhov@gmail.com"
-import urllib.request, urllib.parse, json, threading
 
 __enable_requests__ = True
 try:
