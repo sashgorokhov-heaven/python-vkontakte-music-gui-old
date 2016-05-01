@@ -18,6 +18,7 @@ class ThreadRunnerMixin(object):
         """
 
         thread.start()
+        logger.debug('Running thread: %s', thread)
         if not hasattr(self, '_threads'):
             self._threads = list()
         self._threads.append(thread)
@@ -28,7 +29,7 @@ class BaseThread(QtCore.QThread):
     exititng = False
 
     @QtCore.Slot()
-    def on_exit(self):
+    def on_exit(self, *args, **kwargs):
         logger.debug('%s exiting', str(self))
         self.exititng = True
 

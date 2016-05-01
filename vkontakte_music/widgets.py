@@ -7,20 +7,27 @@ import requests
 from vkontakte_music import cache
 from vkontakte_music.utils.multithreading import ThreadRunnerMixin
 from vkontakte_music.utils.networking import AsyncRequest
+from vkontakte_music.generated import audiolistitemwidget
 
 logger = logging.getLogger(__name__)
 
 
-class VkontakteListWidgetItem(QtGui.QListWidgetItem):
+class VkontakteData(object):
     def __init__(self, data):
         self._data = data
-        super(VkontakteListWidgetItem, self).__init__(self.get_text(data))
+        super(VkontakteData, self).__init__()
 
     def get_data(self):
         return self._data
 
     def get_text(self, data):
         raise NotImplementedError
+
+
+class VkontakteListWidgetItem(VkontakteData, QtGui.QListWidgetItem):
+    def __init__(self, *args, **kwargs):
+        super(VkontakteListWidgetItem, self).__init__(*args, **kwargs)
+        self.setText(self.get_text(self.get_data()))
 
 
 class UrlIconListWidgetItem(VkontakteListWidgetItem, ThreadRunnerMixin):
@@ -65,3 +72,18 @@ class UserListWidgetItem(UrlIconListWidgetItem):
 class GroupListWidgetItem(UserListWidgetItem):
     def get_text(self, data):
         return data['name']
+
+
+class AudioWidget(VkontakteData, QtGui.QWidget, audiolistitemwidget.Ui_Form, ThreadRunnerMixin):
+    def __init__(self, *args, **kwargs):
+        super(AudioWidget, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+        data = self.get_data()
+        self.artistLabel.setText(data['artist'])
+        self.titleLabel.setText(data['title'])
+        self.durationLabel.setText(':'.join(self.get_duration()))
+
+    def get_duration(self):
+        mins = str('0' * (2 - len(str(self._data['duration'] // 60))) + str(self._data['duration'] // 60))
+        secs = str(self._data['duration'] - 60 * (self._data['duration'] // 60))
+        return (mins, secs)
