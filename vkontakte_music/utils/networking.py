@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class AsyncRequest(BaseThread):
-    on_success = QtCore.Signal(requests.Request)
+    on_success = QtCore.Signal(requests.Response)
 
     def __init__(self, url, query=None, on_success=None):
         super(AsyncRequest, self).__init__()
@@ -17,7 +17,7 @@ class AsyncRequest(BaseThread):
         self.query = query
 
     def run(self):
-        logger.debug('Request %s: %s', self.url, self.query)
+        logger.debug('Request %s q=%s', self.url, self.query)
         response = requests.get(url=self.url, params=self.query, timeout=20)
         self.on_response(response)
 
@@ -25,7 +25,7 @@ class AsyncRequest(BaseThread):
         """
         :param requests.Response response:
         """
-        logger.debug('Response: %s', response.text)
+        # logger.debug('Response: %s', response.text)
         self.on_success.emit(response)
 
 

@@ -16,8 +16,8 @@ def main():
 
     pyside_path = os.path.dirname(PySide.__file__)
     resource_converter = os.path.join(pyside_path, 'pyside-rcc.exe')
-    resources_path = os.path.join(settings.QTDESIGNER_SOURCES, 'resourses.qrc')
-    target_resources_path = os.path.join(settings.QTDESIGNER_GENERATED, 'resourses_rc.py')
+    resources_path = os.path.join(settings.QTDESIGNER_SOURCES, 'resources.qrc')
+    target_resources_path = os.path.join(settings.QTDESIGNER_GENERATED, 'resources_rc.py')
 
     print resources_path + ' >> ' + target_resources_path
     os.system('{0} {1} > {2}'.format(resource_converter, resources_path, target_resources_path))

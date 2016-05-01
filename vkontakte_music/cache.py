@@ -73,31 +73,22 @@ class cache(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
-_cache = None
 
 def get(key, default=None):
-    global _cache
-    if _cache is None or _cache and _cache.closed:
-        _cache = cache()
-    return _cache.get(key, default)
+    with cache() as _cache:
+        return _cache.get(key, default)
 
 
 def set(key, value, timeout=None):
-    global _cache
-    if _cache is None or _cache and _cache.closed:
-        _cache = cache()
-    return _cache.set(key, value, timeout)
+    with cache() as _cache:
+        return _cache.set(key, value, timeout)
 
 
 def exists(key):
-    global _cache
-    if _cache is None or _cache and _cache.closed:
-        _cache = cache()
-    return _cache.exists(key)
+    with cache() as _cache:
+        return _cache.exists(key)
 
 
 def sync():
-    global _cache
-    if _cache is None or _cache and _cache.closed:
-        _cache = cache()
-    _cache.shelve.sync()
+    with cache() as _cache:
+        _cache.shelve.sync()
