@@ -6,7 +6,9 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    from PySide import QtGui
     from vkontakte_music.utils.web_auth import show_browser
+    from vkontakte_music.forms.main_form import MainForm
     from vkontakte_music import settings, cache
 
     logger.debug('Application initialized')
@@ -19,7 +21,13 @@ def main():
         access_token = data['access_token']
         cache.set('access_token', access_token, int(data['expires_in']))
     else:
-        logging.info('Got access token from cache')
+        logger.info('Got access token from cache')
+
+    logger.info('Showing main window')
+    app = QtGui.QApplication.instance() or QtGui.QApplication([])
+    main_form = MainForm()
+    main_form.show()
+    app.exec_()
 
 if __name__ == '__main__':
     main()

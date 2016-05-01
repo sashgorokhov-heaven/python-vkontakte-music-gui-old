@@ -340,4 +340,3 @@ class Ui_Form(object):
 
 from PySide import phonon
 import resourses_rc
-import resourses_rc

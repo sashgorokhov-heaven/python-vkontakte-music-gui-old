@@ -1,6 +1,5 @@
 
 
-
 def apply(call):
     def decorator(func):
         def wrapper(*args, **kwargs):

@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class cache(object):
     __instance__ = None
+    closed = False
 
     def __init__(self):
         self.shelve = shelve.open(settings.CACHE_FILENAME)
@@ -33,6 +34,7 @@ class cache(object):
                 if valid_thru > time.time():
                     return value
                 else:
+                    logger.debug('Requested %s but it is outdated: %s', key, valid_thru)
                     self.shelve.pop(key, None)
                     return None
             return value
@@ -42,11 +44,11 @@ class cache(object):
         if isinstance(timeout, int):
             timeout = time.time() + timeout
         elif isinstance(timeout, timedelta):
-            timeout = time.time() + timeout.seconds
+            timeout = time.time() + timeout.seconds * 1000
         elif isinstance(timeout, datetime):
             timeout = int(time.mktime(timeout.timetuple()))
         self.shelve[key] = value, timeout
-        logger.debug('Stored %s with %s for %s', key, value, timeout)
+        logger.debug('Stored %s for %s', key, timeout)
 
     def get(self, key, default=None):
         return self._get_item(key) or default
@@ -55,9 +57,10 @@ class cache(object):
         self._set_item(key, value, timeout)
 
     def exists(self, key):
-        return key in self.shelve
+        return key in self.shelve and self._get_item(key)
 
     def close(self):
+        self.closed = True
         self.shelve.close()
         self.__class__.__instance__ = None
 
@@ -70,22 +73,31 @@ class cache(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
+_cache = None
 
 def get(key, default=None):
-    with cache() as cache_obj:
-        return cache_obj.get(key, default)
+    global _cache
+    if _cache is None or _cache and _cache.closed:
+        _cache = cache()
+    return _cache.get(key, default)
 
 
 def set(key, value, timeout=None):
-    with cache() as cache_obj:
-        return cache_obj.set(key, value, timeout)
+    global _cache
+    if _cache is None or _cache and _cache.closed:
+        _cache = cache()
+    return _cache.set(key, value, timeout)
 
 
 def exists(key):
-    with cache() as cache_obj:
-        return cache_obj.exists(key)
+    global _cache
+    if _cache is None or _cache and _cache.closed:
+        _cache = cache()
+    return _cache.exists(key)
 
 
 def sync():
-    with cache() as cache_obj:
-        cache_obj.shelve.sync()
+    global _cache
+    if _cache is None or _cache and _cache.closed:
+        _cache = cache()
+    _cache.shelve.sync()
