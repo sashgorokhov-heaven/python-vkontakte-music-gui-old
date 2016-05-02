@@ -1,5 +1,7 @@
 import logging
+import re
 
+import functools
 from PySide import QtCore, QtGui
 
 from vkontakte_music import services
@@ -37,10 +39,30 @@ class MainForm(BaseForm, mainform.Ui_Form):
         super(MainForm, self).__init__()
         self.friendsList.itemDoubleClicked.connect(self.item_double_clicked_slot)
         self.groupsList.itemDoubleClicked.connect(self.item_double_clicked_slot)
+
+        self.friendsSearchEdit.textChanged.connect(
+            functools.partial(self._search_edit_text_changed, item_list=self.friendsList))
+        self.groupsSearchEdit.textChanged.connect(
+            functools.partial(self._search_edit_text_changed, item_list=self.groupsList))
+
         self.load_audio.connect(self.load_audio_slot)
 
         self.run_thread(services.api().call('groups.get', fields='photo_100', extended=1, callback_slot=self._on_groups_loaded))
         self.run_thread(services.api().call('users.get', callback_slot=self._on_user_loaded, fields='photo_100'))
+
+    def _search_edit_text_changed(self, text, item_list):
+        if not text:
+            item_list.scrollToItem(item_list.item(0))
+        else:
+            count = item_list.count()
+            for i in range(count):
+                item = item_list.item(i)  # type: UserListWidgetItem
+                data = item.get_data()
+                item_text = item.get_text(data)
+                if re.search(text.lower(), item_text.lower()):
+                    item_list.scrollToItem(item)
+                    item.setSelected(True)
+                    break
 
     @QtCore.Slot(dict)
     def _on_user_loaded(self, data):
