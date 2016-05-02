@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\sashg\PycharmProjects\VK-P-P-Music-Project\vkontakte_music\qtdesigner\audiodownloadwidget.ui'
 #
-# Created: Sun Apr 24 01:13:01 2016
+# Created: Mon May 02 13:46:48 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -45,4 +45,4 @@ class Ui_Form(object):
         Form.setWindowTitle(QtGui.QApplication.translate("Form", "Form", None, QtGui.QApplication.UnicodeUTF8))
         self.progressBar.setFormat(QtGui.QApplication.translate("Form", "   Artist - Title", None, QtGui.QApplication.UnicodeUTF8))
 
-import resourses_rc
+import resources_rc

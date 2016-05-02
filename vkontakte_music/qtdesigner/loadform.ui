@@ -70,7 +70,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="resourses.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections/>
 </ui>

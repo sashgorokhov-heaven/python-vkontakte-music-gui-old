@@ -84,7 +84,7 @@
    <string>Form</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resourses.qrc">
+   <iconset>
     <normaloff>:/icons/Icons/music.ico</normaloff>:/icons/Icons/music.ico</iconset>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -190,58 +190,13 @@
      <property name="movable">
       <bool>false</bool>
      </property>
-     <widget class="QWidget" name="userTab">
-      <attribute name="icon">
-       <iconset resource="resourses.qrc">
-        <normaloff>:/icons/Icons/meicon.ico</normaloff>:/icons/Icons/meicon.ico</iconset>
-      </attribute>
-      <attribute name="title">
-       <string>Я</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QListWidget" name="userList">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::SingleSelection</enum>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>50</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="textElideMode">
-          <enum>Qt::ElideLeft</enum>
-         </property>
-         <property name="verticalScrollMode">
-          <enum>QAbstractItemView::ScrollPerPixel</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="friendsTab">
       <attribute name="icon">
-       <iconset resource="resourses.qrc">
+       <iconset>
         <normaloff>:/icons/Icons/friendsicon.ico</normaloff>:/icons/Icons/friendsicon.ico</iconset>
       </attribute>
       <attribute name="title">
-       <string>Друзья</string>
+       <string>Люди</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="leftMargin">
@@ -288,7 +243,7 @@
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="resourses.qrc">:/icons/Icons/findicon.ico</pixmap>
+            <pixmap>:/icons/Icons/findicon.ico</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>
@@ -383,7 +338,7 @@ border-bottom-left-radius: 7px;
      </widget>
      <widget class="QWidget" name="groupsTab">
       <attribute name="icon">
-       <iconset resource="resourses.qrc">
+       <iconset>
         <normaloff>:/icons/Icons/neticon.ico</normaloff>:/icons/Icons/neticon.ico</iconset>
       </attribute>
       <attribute name="title">
@@ -434,7 +389,7 @@ border-bottom-left-radius: 7px;
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="resourses.qrc">:/icons/Icons/findicon.ico</pixmap>
+            <pixmap>:/icons/Icons/findicon.ico</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>
@@ -608,7 +563,7 @@ border-bottom-left-radius: 7px;
        </property>
        <property name="maximumSize">
         <size>
-         <width>550</width>
+         <width>16777215</width>
          <height>16777215</height>
         </size>
        </property>
@@ -666,131 +621,12 @@ border-bottom-left-radius: 7px;
        </property>
       </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_7">
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QPushButton" name="downloadButton">
-         <property name="text">
-          <string>Ожидают загрузки: 0 </string>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="downloadSelectedButton">
-         <property name="text">
-          <string>Загрузить выбранное</string>
-         </property>
-         <property name="icon">
-          <iconset resource="resourses.qrc">
-           <normaloff>:/icons/Icons/windowicon.ico</normaloff>:/icons/Icons/windowicon.ico</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>15</width>
-           <height>15</height>
-          </size>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_5">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="label_8">
-       <property name="maximumSize">
-        <size>
-         <width>25</width>
-         <height>25</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap resource="resourses.qrc">:/icons/Icons/helpicon.ico</pixmap>
-       </property>
-       <property name="scaledContents">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="Phonon::VolumeSlider" name="volumeSlider">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="tracking">
-        <bool>true</bool>
-       </property>
-       <property name="muteVisible">
-        <bool>true</bool>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>16</width>
-         <height>16</height>
-        </size>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>Phonon::VolumeSlider</class>
-   <extends>QWidget</extends>
-   <header location="global">phonon/volumeslider.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
-  <include location="resourses.qrc"/>
-  <include location="resourses.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections/>
 </ui>
