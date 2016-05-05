@@ -48,7 +48,7 @@ class UrlIconListWidgetItem(VkontakteListWidgetItem, ThreadRunnerMixin):
         pixmap = QtGui.QPixmap()
         pixmap.loadFromData(cache.get(key))
         self.setIcon(QtGui.QIcon(pixmap))
-        logger.debug('Set from cache: %s', key)
+        #logger.debug('Set from cache: %s', key)
 
     @QtCore.Slot(requests.Response)
     def _on_icon_loaded(self, response):
@@ -87,3 +87,15 @@ class AudioWidget(VkontakteData, QtGui.QWidget, audiolistitemwidget.Ui_Form, Thr
         mins = str('0' * (2 - len(str(self._data['duration'] // 60))) + str(self._data['duration'] // 60))
         secs = str(self._data['duration'] - 60 * (self._data['duration'] // 60))
         return (mins, secs)
+
+
+class AudioListItemWidget(VkontakteListWidgetItem):
+    format = '{0[artist]} - {0[title]} {1[0]}:{1[1]}'
+
+    def get_text(self, data):
+        return unicode(self.format).format(data, self.get_duration(data))
+
+    def get_duration(self, data):
+        mins = str('0' * (2 - len(str(data['duration'] // 60))) + str(data['duration'] // 60))
+        secs = str(data['duration'] - 60 * (data['duration'] // 60))
+        return mins, secs

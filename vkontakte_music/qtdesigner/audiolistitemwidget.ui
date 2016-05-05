@@ -64,7 +64,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="resourses.qrc">:/newFlatIcons/Icons/Button-Play-icon.png</pixmap>
+        <pixmap>:/newFlatIcons/Icons/Button-Play-icon.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -79,10 +79,17 @@
          <pointsize>9</pointsize>
          <weight>75</weight>
          <bold>true</bold>
+         <kerning>true</kerning>
         </font>
        </property>
        <property name="text">
         <string>Artist</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
        </property>
        <property name="wordWrap">
         <bool>false</bool>
@@ -111,7 +118,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Title</string>
+        <string/>
        </property>
        <property name="wordWrap">
         <bool>false</bool>

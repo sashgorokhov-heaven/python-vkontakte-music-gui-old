@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\sashg\PycharmProjects\VK-P-P-Music-Project\vkontakte_music\qtdesigner\mainform.ui'
 #
-# Created: Mon May 02 13:46:50 2016
+# Created: Fri May 06 00:31:22 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -240,6 +240,20 @@ class Ui_Form(object):
         self.horizontalLayout_6.addWidget(self.countLabel)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem)
+        self.label_6 = QtGui.QLabel(Form)
+        self.label_6.setMargin(3)
+        self.label_6.setObjectName("label_6")
+        self.horizontalLayout_6.addWidget(self.label_6)
+        self.albums_combobox = QtGui.QComboBox(Form)
+        self.albums_combobox.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.albums_combobox.setFrame(True)
+        self.albums_combobox.setObjectName("albums_combobox")
+        self.horizontalLayout_6.addWidget(self.albums_combobox)
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_6.addItem(spacerItem1)
+        self.open_in_browser_button = QtGui.QPushButton(Form)
+        self.open_in_browser_button.setObjectName("open_in_browser_button")
+        self.horizontalLayout_6.addWidget(self.open_in_browser_button)
         self.verticalLayout_4.addLayout(self.horizontalLayout_6)
         self.audioList = QtGui.QListWidget(Form)
         self.audioList.setMinimumSize(QtCore.QSize(350, 0))
@@ -262,6 +276,19 @@ class Ui_Form(object):
         self.audioList.setSpacing(1)
         self.audioList.setObjectName("audioList")
         self.verticalLayout_4.addWidget(self.audioList)
+        self.horizontalLayout_7 = QtGui.QHBoxLayout()
+        self.horizontalLayout_7.setContentsMargins(-1, 11, -1, -1)
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem2)
+        self.select_all_button = QtGui.QPushButton(Form)
+        self.select_all_button.setObjectName("select_all_button")
+        self.horizontalLayout_7.addWidget(self.select_all_button)
+        self.deselect_all_button = QtGui.QPushButton(Form)
+        self.deselect_all_button.setFlat(False)
+        self.deselect_all_button.setObjectName("deselect_all_button")
+        self.horizontalLayout_7.addWidget(self.deselect_all_button)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_7)
         self.horizontalLayout_5.addLayout(self.verticalLayout_4)
 
         self.retranslateUi(Form)
@@ -277,5 +304,9 @@ class Ui_Form(object):
         self.label_5.setText(QtGui.QApplication.translate("Form", "Музыка", None, QtGui.QApplication.UnicodeUTF8))
         self.label_7.setText(QtGui.QApplication.translate("Form", "Аудиозаписей: ", None, QtGui.QApplication.UnicodeUTF8))
         self.countLabel.setText(QtGui.QApplication.translate("Form", "0", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_6.setText(QtGui.QApplication.translate("Form", "Альбомы", None, QtGui.QApplication.UnicodeUTF8))
+        self.open_in_browser_button.setText(QtGui.QApplication.translate("Form", "Открыть в браузере", None, QtGui.QApplication.UnicodeUTF8))
+        self.select_all_button.setText(QtGui.QApplication.translate("Form", "Выбрать все", None, QtGui.QApplication.UnicodeUTF8))
+        self.deselect_all_button.setText(QtGui.QApplication.translate("Form", "Снять выделение", None, QtGui.QApplication.UnicodeUTF8))
 
 import resources_rc

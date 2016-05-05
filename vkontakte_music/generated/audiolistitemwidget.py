@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\sashg\PycharmProjects\VK-P-P-Music-Project\vkontakte_music\qtdesigner\audiolistitemwidget.ui'
 #
-# Created: Mon May 02 13:46:49 2016
+# Created: Fri May 06 00:31:20 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -42,6 +42,8 @@ class Ui_Form(object):
         font.setWeight(75)
         font.setBold(True)
         self.artistLabel.setFont(font)
+        self.artistLabel.setTextFormat(QtCore.Qt.AutoText)
+        self.artistLabel.setScaledContents(False)
         self.artistLabel.setWordWrap(False)
         self.artistLabel.setObjectName("artistLabel")
         self.horizontalLayout_2.addWidget(self.artistLabel)
@@ -58,6 +60,7 @@ class Ui_Form(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.titleLabel.setFont(font)
+        self.titleLabel.setText("")
         self.titleLabel.setWordWrap(False)
         self.titleLabel.setObjectName("titleLabel")
         self.horizontalLayout_2.addWidget(self.titleLabel)
@@ -79,7 +82,6 @@ class Ui_Form(object):
         Form.setWindowTitle(QtGui.QApplication.translate("Form", "Form", None, QtGui.QApplication.UnicodeUTF8))
         self.artistLabel.setText(QtGui.QApplication.translate("Form", "Artist", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("Form", " - ", None, QtGui.QApplication.UnicodeUTF8))
-        self.titleLabel.setText(QtGui.QApplication.translate("Form", "Title", None, QtGui.QApplication.UnicodeUTF8))
         self.durationLabel.setText(QtGui.QApplication.translate("Form", "4:20", None, QtGui.QApplication.UnicodeUTF8))
 
 import resources_rc
