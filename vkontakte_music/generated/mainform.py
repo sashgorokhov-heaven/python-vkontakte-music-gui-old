@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\sashg\PycharmProjects\VK-P-P-Music-Project\vkontakte_music\qtdesigner\mainform.ui'
 #
-# Created: Fri May 06 00:31:22 2016
+# Created: Fri May 06 19:08:09 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -279,6 +279,12 @@ class Ui_Form(object):
         self.horizontalLayout_7 = QtGui.QHBoxLayout()
         self.horizontalLayout_7.setContentsMargins(-1, 11, -1, -1)
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.label_8 = QtGui.QLabel(Form)
+        self.label_8.setObjectName("label_8")
+        self.horizontalLayout_7.addWidget(self.label_8)
+        self.selected_count_label = QtGui.QLabel(Form)
+        self.selected_count_label.setObjectName("selected_count_label")
+        self.horizontalLayout_7.addWidget(self.selected_count_label)
         spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_7.addItem(spacerItem2)
         self.select_all_button = QtGui.QPushButton(Form)
@@ -306,6 +312,8 @@ class Ui_Form(object):
         self.countLabel.setText(QtGui.QApplication.translate("Form", "0", None, QtGui.QApplication.UnicodeUTF8))
         self.label_6.setText(QtGui.QApplication.translate("Form", "Альбомы", None, QtGui.QApplication.UnicodeUTF8))
         self.open_in_browser_button.setText(QtGui.QApplication.translate("Form", "Открыть в браузере", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_8.setText(QtGui.QApplication.translate("Form", "Выбрано:", None, QtGui.QApplication.UnicodeUTF8))
+        self.selected_count_label.setText(QtGui.QApplication.translate("Form", "0", None, QtGui.QApplication.UnicodeUTF8))
         self.select_all_button.setText(QtGui.QApplication.translate("Form", "Выбрать все", None, QtGui.QApplication.UnicodeUTF8))
         self.deselect_all_button.setText(QtGui.QApplication.translate("Form", "Снять выделение", None, QtGui.QApplication.UnicodeUTF8))
 

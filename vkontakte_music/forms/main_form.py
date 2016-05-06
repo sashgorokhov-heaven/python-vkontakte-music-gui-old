@@ -63,11 +63,16 @@ class MainForm(BaseForm, mainform.Ui_Form):
 
         self.select_all_button.clicked.connect(self.audioList.selectAll)
         self.deselect_all_button.clicked.connect(self.audioList.clearSelection)
+        self.audioList.itemSelectionChanged.connect(self.update_selection)
 
         self.albums_combobox.currentIndexChanged.connect(self.album_changed)
 
         self.run_thread(services.api().call('groups.get', fields='photo_100', extended=1, callback_slot=self._on_groups_loaded))
         self.run_thread(services.api().call('users.get', callback_slot=self._on_user_loaded, fields='photo_100'))
+
+    @QtCore.Slot()
+    def update_selection(self):
+        self.selected_count_label.setText(str(len(self.audioList.selectedIndexes())))
 
     def _search_edit_text_changed(self, text, item_list):
         if not text:
@@ -138,6 +143,7 @@ class MainForm(BaseForm, mainform.Ui_Form):
         logger.info('Loading audio of %s and %s', owner_id, album_id)
         self.current_id = owner_id
         self.audioList.clear()
+        self.selected_count_label.setText('0')
 
         if self.open_in_browser_function is not None:
             self.open_in_browser_button.clicked.disconnect(self.open_in_browser_function)
