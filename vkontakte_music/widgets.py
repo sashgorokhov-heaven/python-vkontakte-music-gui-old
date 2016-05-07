@@ -7,7 +7,6 @@ import requests
 from vkontakte_music import cache
 from vkontakte_music.utils.multithreading import ThreadRunnerMixin
 from vkontakte_music.utils.networking import AsyncRequest
-from vkontakte_music.generated import audiolistitemwidget
 
 logger = logging.getLogger(__name__)
 
@@ -74,26 +73,32 @@ class GroupListWidgetItem(UserListWidgetItem):
         return data['name']
 
 
-class AudioWidget(VkontakteData, QtGui.QWidget, audiolistitemwidget.Ui_Form, ThreadRunnerMixin):
-    def __init__(self, *args, **kwargs):
-        super(AudioWidget, self).__init__(*args, **kwargs)
-        self.setupUi(self)
-        data = self.get_data()
-        self.artistLabel.setText(data['artist'])
-        self.titleLabel.setText(data['title'])
-        self.durationLabel.setText(':'.join(self.get_duration()))
-
-    def get_duration(self):
-        mins = str('0' * (2 - len(str(self._data['duration'] // 60))) + str(self._data['duration'] // 60))
-        secs = str(self._data['duration'] - 60 * (self._data['duration'] // 60))
-        return (mins, secs)
-
-
 class AudioListItemWidget(VkontakteListWidgetItem):
     format = '{0[artist]} - {0[title]} {1[0]}:{1[1]}'
 
     def get_text(self, data):
         return unicode(self.format).format(data, self.get_duration(data))
+
+    def get_duration(self, data):
+        mins = str('0' * (2 - len(str(data['duration'] // 60))) + str(data['duration'] // 60))
+        secs = str(data['duration'] - 60 * (data['duration'] // 60))
+        return mins, secs
+
+
+class DownloadListItemWidget(VkontakteData, QtGui.QProgressBar):
+    downloading = False
+
+    def __init__(self, *args, **kwargs):
+        super(DownloadListItemWidget, self).__init__(*args, **kwargs)
+        self.setFormat(self.get_text(self.get_data()))
+        self.setMinimum(0)
+        self.setMaximum(100)
+        self.setAlignment(QtCore.Qt.AlignHCenter)
+        self.setAlignment(QtCore.Qt.AlignVCenter)
+        self.setValue(0)
+
+    def get_text(self, data):
+        return unicode(AudioListItemWidget.format).format(data, self.get_duration(data)) + '  %p%'
 
     def get_duration(self, data):
         mins = str('0' * (2 - len(str(data['duration'] // 60))) + str(data['duration'] // 60))

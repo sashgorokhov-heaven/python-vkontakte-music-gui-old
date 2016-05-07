@@ -9,8 +9,9 @@ from vkontakte_music import services
 from vkontakte_music.forms.base import BaseForm
 from vkontakte_music.generated import mainform
 from vkontakte_music.utils.multithreading import GeneratorExecutor, BaseThread
-from vkontakte_music.widgets import UserListWidgetItem, GroupListWidgetItem, VkontakteData, AudioWidget, \
+from vkontakte_music.widgets import UserListWidgetItem, GroupListWidgetItem, VkontakteData, \
     AudioListItemWidget
+from vkontakte_music.forms import download_form
 
 logger = logging.getLogger(__name__)
 
@@ -43,12 +44,16 @@ class AudioLoadThread(BaseThread):
 
 
 class MainForm(BaseForm, mainform.Ui_Form):
-    stop = False
     load_audio = QtCore.Signal(int, int)
     current_id = None
+    download_form = None
 
     def __init__(self):
         super(MainForm, self).__init__()
+        self.download_form = download_form.DownloadForm()
+        self.on_exit.connect(self.download_form.on_exit)
+        self.downloads_button.clicked.connect(lambda: self.download_form.show())
+
         self.friendsList.itemDoubleClicked.connect(self.item_double_clicked_slot)
         self.groupsList.itemDoubleClicked.connect(self.item_double_clicked_slot)
 
@@ -66,13 +71,19 @@ class MainForm(BaseForm, mainform.Ui_Form):
         self.audioList.itemSelectionChanged.connect(self.update_selection)
 
         self.albums_combobox.currentIndexChanged.connect(self.album_changed)
+        self.download_button.clicked.connect(self.download_button_clicked)
 
         self.run_thread(services.api().call('groups.get', fields='photo_100', extended=1, callback_slot=self._on_groups_loaded))
         self.run_thread(services.api().call('users.get', callback_slot=self._on_user_loaded, fields='photo_100'))
 
-    @QtCore.Slot()
+    def download_button_clicked(self):
+        self.download_form.add_downloads(item.get_data() for item in self.audioList.selectedItems())
+        self.download_form.show()
+
     def update_selection(self):
-        self.selected_count_label.setText(str(len(self.audioList.selectedIndexes())))
+        count = len(self.audioList.selectedIndexes())
+        self.selected_count_label.setText(str(count))
+        self.download_button.setEnabled(bool(count))
 
     def _search_edit_text_changed(self, text, item_list):
         if not text:
@@ -134,6 +145,7 @@ class MainForm(BaseForm, mainform.Ui_Form):
     @GeneratorExecutor()
     def set_albums(self, data):
         self.albums_combobox.clear()
+        self.albums_combobox.addItem('---', {'id': 0, 'owner_id': self.current_id})
         for album in data['response']['items']:
             yield self.albums_combobox.addItem(album['title'], album)
 

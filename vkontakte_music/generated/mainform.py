@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\sashg\PycharmProjects\VK-P-P-Music-Project\vkontakte_music\qtdesigner\mainform.ui'
 #
-# Created: Fri May 06 19:08:09 2016
+# Created: Sat May 07 23:37:51 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -285,8 +285,17 @@ class Ui_Form(object):
         self.selected_count_label = QtGui.QLabel(Form)
         self.selected_count_label.setObjectName("selected_count_label")
         self.horizontalLayout_7.addWidget(self.selected_count_label)
+        self.download_button = QtGui.QPushButton(Form)
+        self.download_button.setEnabled(False)
+        self.download_button.setObjectName("download_button")
+        self.horizontalLayout_7.addWidget(self.download_button)
         spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_7.addItem(spacerItem2)
+        self.downloads_button = QtGui.QPushButton(Form)
+        self.downloads_button.setObjectName("downloads_button")
+        self.horizontalLayout_7.addWidget(self.downloads_button)
+        spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem3)
         self.select_all_button = QtGui.QPushButton(Form)
         self.select_all_button.setObjectName("select_all_button")
         self.horizontalLayout_7.addWidget(self.select_all_button)
@@ -314,6 +323,8 @@ class Ui_Form(object):
         self.open_in_browser_button.setText(QtGui.QApplication.translate("Form", "Открыть в браузере", None, QtGui.QApplication.UnicodeUTF8))
         self.label_8.setText(QtGui.QApplication.translate("Form", "Выбрано:", None, QtGui.QApplication.UnicodeUTF8))
         self.selected_count_label.setText(QtGui.QApplication.translate("Form", "0", None, QtGui.QApplication.UnicodeUTF8))
+        self.download_button.setText(QtGui.QApplication.translate("Form", "Загрузить", None, QtGui.QApplication.UnicodeUTF8))
+        self.downloads_button.setText(QtGui.QApplication.translate("Form", "Загрузки", None, QtGui.QApplication.UnicodeUTF8))
         self.select_all_button.setText(QtGui.QApplication.translate("Form", "Выбрать все", None, QtGui.QApplication.UnicodeUTF8))
         self.deselect_all_button.setText(QtGui.QApplication.translate("Form", "Снять выделение", None, QtGui.QApplication.UnicodeUTF8))
 

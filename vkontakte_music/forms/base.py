@@ -11,7 +11,7 @@ class BaseForm(QtGui.QWidget, ThreadRunnerMixin):
         super(BaseForm, self).__init__(*args, **kwargs)
         if hasattr(self, 'setupUi'):
             self.setupUi(self)
-        self.setWindowTitle(settings.WINDOW_TITLE)
+        #self.setWindowTitle(settings.WINDOW_TITLE)
 
     def closeEvent(self, event):
         self.on_exit.emit()
