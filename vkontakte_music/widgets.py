@@ -104,3 +104,6 @@ class DownloadListItemWidget(VkontakteData, QtGui.QProgressBar):
         mins = str('0' * (2 - len(str(data['duration'] // 60))) + str(data['duration'] // 60))
         secs = str(data['duration'] - 60 * (data['duration'] // 60))
         return mins, secs
+
+    def __unicode__(self):
+        return u'{0[artist]} - {0[title]}'.format(self.get_data())
