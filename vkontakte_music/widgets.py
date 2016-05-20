@@ -36,12 +36,13 @@ class UrlIconListWidgetItem(VkontakteListWidgetItem, ThreadRunnerMixin):
             self.load_icon()
 
     def load_icon(self):
-        url = self.get_icon_url(self._data)
-        if not cache.exists(url):
-            logger.debug('Not found in cache: %s', url)
-            self.run_thread(AsyncRequest(url, on_success=self._on_icon_loaded))
-        else:
-            self._set_icon_from_cache(url)
+        pass
+        #url = self.get_icon_url(self._data)
+        #if not cache.exists(url):
+        #    logger.debug('Not found in cache: %s', url)
+        #    self.run_thread(AsyncRequest(url, on_success=self._on_icon_loaded))
+        #else:
+        #    self._set_icon_from_cache(url)
 
     def _set_icon_from_cache(self, key):
         pixmap = QtGui.QPixmap()
@@ -77,7 +78,7 @@ class AudioListItemWidget(VkontakteListWidgetItem):
     format = '{0[artist]} - {0[title]} {1[0]}:{1[1]}'
 
     def get_text(self, data):
-        return unicode(self.format).format(data, self.get_duration(data))
+        return self.format.format(data, self.get_duration(data))
 
     def get_duration(self, data):
         mins = str('0' * (2 - len(str(data['duration'] // 60))) + str(data['duration'] // 60))
@@ -98,7 +99,7 @@ class DownloadListItemWidget(VkontakteData, QtGui.QProgressBar):
         self.setValue(0)
 
     def get_text(self, data):
-        return unicode(AudioListItemWidget.format).format(data, self.get_duration(data)) + '  %p%'
+        return AudioListItemWidget.format.format(data, self.get_duration(data)) + '  %p%'
 
     def get_duration(self, data):
         mins = str('0' * (2 - len(str(data['duration'] // 60))) + str(data['duration'] // 60))

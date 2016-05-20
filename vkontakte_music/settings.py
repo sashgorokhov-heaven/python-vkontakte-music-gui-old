@@ -2,12 +2,17 @@
 import os
 import string
 
+import sys
+
 CLIENT_ID = '5416726'
 SCOPE = ['groups', 'audio', 'friends']
 
 WINDOW_TITLE = 'Vkontakte Music'
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+if not getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+else:
+    BASE_DIR = os.path.dirname(sys.executable)
 
 CACHE_FILENAME = os.path.join(BASE_DIR, '.cache.shelve')
 

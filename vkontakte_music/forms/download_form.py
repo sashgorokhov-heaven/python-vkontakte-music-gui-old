@@ -1,7 +1,10 @@
 # coding=utf-8
 import logging
 import os
-from urllib import urlretrieve
+try:
+    from urllib import urlretrieve
+except ImportError:
+    from urllib.request import urlretrieve
 
 import shutil
 
@@ -146,34 +149,34 @@ class DownloadForm(BaseForm, downloadform.Ui_download_form):
         :rtype: str
         """
         base_directory = self.get_download_directory()
-        if self.album_folder_checkbox.isChecked():
-            # FIXME
-            artist = get_artist(audio)
-            logger.debug('Artist: %s', artist)
-            if os.path.exists(os.path.join(base_directory, artist)):
-                base_directory = os.path.join(base_directory, artist)
-                logger.debug('Found artists folder: %s', base_directory)
-            else:
-                exists = self._find_by_artist(artist, base_directory)
-                if exists:
-                    logger.debug('Found another tracks: %s', exists)
-                    base_directory = os.path.join(base_directory, artist)
-                    os.makedirs(base_directory)
-                    for filename in exists:
-                        src = os.path.join(self.get_download_directory(), filename)
-                        dst = os.path.join(base_directory, filename)
-                        shutil.move(src, dst)
+        # if self.album_folder_checkbox.isChecked():
+        #     # FIXME
+        #     artist = get_artist(audio)
+        #     logger.debug('Artist: %s', artist)
+        #     if os.path.exists(os.path.join(base_directory, artist)):
+        #         base_directory = os.path.join(base_directory, artist)
+        #         logger.debug('Found artists folder: %s', base_directory)
+        #     else:
+        #         exists = self._find_by_artist(artist, base_directory)
+        #         if exists:
+        #             logger.debug('Found another tracks: %s', exists)
+        #             base_directory = os.path.join(base_directory, artist)
+        #             os.makedirs(base_directory)
+        #             for filename in exists:
+        #                 src = os.path.join(self.get_download_directory(), filename)
+        #                 dst = os.path.join(base_directory, filename)
+        #                 shutil.move(src, dst)
 
         filename = get_audio_filename(audio)
         return os.path.join(base_directory, filename)
 
-    def _find_by_artist(self, artist, base_directory=None):
-        download_directory = base_directory or self.get_download_directory()
-        if not os.path.exists(download_directory):
-            os.makedirs(download_directory)
-            return []
-        paths = os.listdir(download_directory)
-        return list(filter(lambda path: path.startswith(artist), paths))
+    # def _find_by_artist(self, artist, base_directory=None):
+    #     download_directory = base_directory or self.get_download_directory()
+    #     if not os.path.exists(download_directory):
+    #         os.makedirs(download_directory)
+    #         return []
+    #     paths = os.listdir(download_directory)
+    #     return list(filter(lambda path: path.startswith(artist), paths))
 
     @GeneratorExecutor()
     def delete_button_clicked(self):

@@ -328,4 +328,3 @@ class Ui_Form(object):
         self.select_all_button.setText(QtGui.QApplication.translate("Form", "Выбрать все", None, QtGui.QApplication.UnicodeUTF8))
         self.deselect_all_button.setText(QtGui.QApplication.translate("Form", "Снять выделение", None, QtGui.QApplication.UnicodeUTF8))
 
-import resources_rc
